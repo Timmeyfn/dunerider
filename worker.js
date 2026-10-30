@@ -2238,7 +2238,7 @@ function stepGround(dt, inp){
   var yBall = S.pos.y + S.vy * dt - 0.5 * G * dt * dt;
   // launch only when the ground falls away faster than gravity could pull us down with it
   // (arcade: the sand only "holds" you with 0.6 G, so hill tops and steepening drop-offs throw you into the air)
-  var launch = (S.vy - vyG) > G * dt * 0.6 && aspd > 6 && !S.glued;      // drag racers are glued to the road
+  var launch = (S.vy - vyG) > G * dt * 0.45 && aspd > 6 && !S.glued;      // drag racers are glued to the road
   if (launch && S.grace <= 0) {
     var sharp = (S.vy - vyG) > G * dt * 0.9;
     takeoff(); S.pos.y = Math.max(yBall, h + 0.01);
@@ -2254,6 +2254,11 @@ function stepGround(dt, inp){
   groundQuat(S.yaw, normalAt(S.pos.x, S.pos.z, n), -S.steerS * VD.lean * Math.min(1, aspd / 8), S.qT);
   S.q.slerp(S.qT, 1 - Math.exp(-14 * dt));
   if (S.glued) return;
+  if (S.boosting && S.wheelie > (VD.wheelieA || 0.45) * 0.55 && aspd > 4) {          // wheelie + boost: launch off the ground nose-first, like a Rocket League car
+    takeoff(); S.vy = Math.max(S.vy, 0) + 7; S.pos.y += 0.3;
+    S.q.multiply(tmpQ.setFromAxisAngle(AX, -Math.max(0.5, S.wheelie)));
+    return;
+  }
   if (inp.jump) { S.vy = Math.min(50, Math.max(S.vy, 0)) + VD.jump; takeoff(); sfx('jump'); }
   if (VD.thrust && inp.thrust && S.fuel > 0.02) { S.vy = Math.max(S.vy, 0) + 4; takeoff(); }
 }
@@ -2261,7 +2266,7 @@ function stepGround(dt, inp){
 // gravity gets stronger the higher you are above the ground, so big launches don't send you into space.
 // Normal jumps (under ~40 m) feel the same; the Rocket Roadster's thrusters ignore the extra pull.
 function airGravity(){
-  if (S.thrusting) return 1;
+  if (S.thrusting || S.boosting) return 1;
   var above = S.pos.y - VD.com - baseHeight(S.pos.x, S.pos.z);
   if (VD.wings && S.wing > 0.5) {               // open wings give lift and let you soar higher
     var ceil = VD.admin ? 400 : 180;
@@ -2295,8 +2300,12 @@ function stepAir(dt, inp){
     if (fwd.lengthSq() > 0.01) {
       fwd.normalize();
       var ocA = S.overclock ? 10 : 1;
-      var a = (S.boosting ? (VD.admin ? 40 : 14) * ocA : 0) + (VD.thrust && inp.thr ? (VD.airAccel || 7) : 0) + (VD.admin && inp.thr ? (S.wingsOut ? 20 : 40) * ocA : 0);   // wings tucked = more speed in the air
+      var a = (VD.thrust && inp.thr ? (VD.airAccel || 7) : 0) + (VD.admin && inp.thr ? (S.wingsOut ? 20 : 40) * ocA : 0);   // wings tucked = more speed in the air
       S.vx += fwd.x * a * dt; S.vz += fwd.z * a * dt;
+    }
+    if (S.boosting) {                              // Rocket League style: boost pushes you wherever the nose points, up included
+      var nose = tmpV.set(0, 0, 1).applyQuaternion(S.q).normalize(), ba = (VD.admin ? 45 : 30) * (S.overclock ? 10 : 1);
+      S.vx += nose.x * ba * dt; S.vy += nose.y * ba * dt; S.vz += nose.z * ba * dt;
     }
   }
   S.vy -= G * airGravity() * dt;
@@ -2335,7 +2344,7 @@ function stepAir(dt, inp){
   S.acc.p += S.angV.x * dt; S.acc.s += S.angV.y * dt; S.acc.r += S.angV.z * dt;
   // with no trick keys held, gently line the nose up with the flight path so landings come out clean
   var trickKeys = inp.front || inp.back || inp.rollL || inp.rollR || inp.spinL || inp.spinR;
-  if (!trickKeys && Math.hypot(S.vx, S.vz) > 1) {
+  if (!trickKeys && !S.boosting && Math.hypot(S.vx, S.vz) > 1) {
     var hsA = Math.hypot(S.vx, S.vz), pitch = Math.max(-0.45, Math.min(0.45, Math.atan2(S.vy, hsA) * 0.6));
     var fv = tmpV.set(S.vx, Math.tan(pitch) * hsA, S.vz).normalize();   // follow the flight path, but never nose-dive
     var xv = tmpV2.crossVectors(AY, fv).normalize();
@@ -3114,7 +3123,8 @@ function checkUserObjects(){
 // sandbox switches
 var GRAVITY = { moon: ['🌙 Moon', 0.35], normal: ['🌍 Normal', 1], heavy: ['🪐 Heavy', 1.8] };
 function applyGravity(){ if (!GRAVITY[prefs.grav]) prefs.grav = 'normal'; G = 17 * GRAVITY[prefs.grav][1]; }
-function noCrash(){ return VD.admin || (prefs.god && !VD.flight); }
+// you can't crash for 3 s after hyperspace, or while going faster than 1,000 km/h on the ground (you just smash through)
+function noCrash(){ return VD.admin || (prefs.god && !VD.flight) || S.safeT > 0 || (!VD.flight && (S.grounded ? Math.abs(S.speed) : Math.hypot(S.vx, S.vz)) > 280); }
 
 function inWater(){
   for (var i = 0; i < activeOases.length; i++) {
@@ -4195,6 +4205,7 @@ function updateRace(dt){
 }
 
 function updatePlay(dt){
+  if (S.safeT > 0) S.safeT -= dt;
   if (hornCool > 0) hornCool -= dt;
   updateParked(dt);
   updateMissiles(dt);
@@ -4318,7 +4329,7 @@ function setVehicle(key, keepState){
   vehChip.innerHTML = VD.icon + ' ' + VD.name.toUpperCase() + '<small>' + keyName(binds.vehicle) + ' to change vehicle · ' + keyName(binds.camera) + ' camera · ' + keyName(binds.overclock) + ' overclock' +
     (VD.flight === 'heli' ? '<br>arrows rotate · ' + keyName(binds.jump) + ' level out' : '') +
     (VD.flight === 'rocket' ? '<br>' + keyName(binds.spinL) + ' booster landing · ' + keyName(binds.jump) + ' eject' : '') +
-    (VD.admin ? '<br>' + keyName(binds.wings) + ' wings · ' + keyName(binds.thrust) + ' hyperspace' : VD.hyper ? '<br>' + keyName(binds.thrust) + ' hyperspace' : '') + '</small>';
+    (VD.admin ? '<br>' + keyName(binds.wings) + ' wings · ' + keyName(binds.thrust) + ' hyperspace' : VD.thrust ? '<br>double-tap ' + keyName(binds.thrust) + ' = hyperspace' : '<br>' + keyName(binds.thrust) + ' hyperspace') + '</small>';
   document.getElementById('fuel').style.display = VD.thrust ? 'block' : 'none';
   renderVehicles(); renderPaints();
 }
@@ -4885,6 +4896,30 @@ function updateWings(dt){
   }
 }
 
+// drag race flying: aircraft can fly down the strip at full speed, but only dead straight and a few metres up
+function stepRail(dt, inp){
+  var thrust;
+  if (VD.flight === 'heli') thrust = ((inp.thr ? 24 : 0) + (S.boosting ? 22 : 0)) * (S.overclock ? 6 : 1);
+  else thrust = ((inp.thr ? (VD.jt || 26) : (VD.jtIdle || 6)) + (S.boosting ? (VD.jtBoost || 30) : 0)) * (S.overclock ? (VD.jtOc || 6) : 1);
+  if (inp.brk) S.speed = Math.max(0, S.speed - (22 + S.speed * 0.6) * dt);
+  S.speed += (thrust - (VD.jDrag || 2.6e-4) * S.speed * S.speed) * dt;
+  if (S.speed < 0) S.speed = 0;
+  var steer = (inp.left ? 1 : 0) - (inp.right ? 1 : 0);
+  S.steerS += (steer - S.steerS) * (1 - Math.exp(-6 * dt));
+  S.pos.x += S.steerS * 9 * dt;                                              // ← → slide between lanes
+  var edge = LANE_W * 4 - 2;
+  if (Math.abs(S.pos.x - STRIP_X) > edge) S.pos.x = STRIP_X + Math.sign(S.pos.x - STRIP_X) * edge;
+  S.yaw = 0; S.pos.z += S.speed * dt;
+  var want = S.speed > 50 ? 5 : 0;                                            // lifts off once it's going fast enough
+  S.railH = (S.railH || 0) + (want - (S.railH || 0)) * (1 - Math.exp(-2 * dt));
+  S.pos.y = heightAt(S.pos.x, S.pos.z) + VD.com + S.railH;
+  S.grounded = S.railH < 0.4; S.vx = 0; S.vy = 0; S.vz = S.speed; S.horiz = S.speed;
+  S.rotor = 1; S.roar = (inp.thr ? 0.05 : 0.02) + (S.boosting ? 0.1 : 0); S.flightT = 0; S.sink = 0; S.angV.set(0, 0, 0);
+  groundQuat(0, AY, -S.steerS * 0.35, S.q);
+  if (S.railH > 0.4 && S.railH < 4.6 && want) S.q.multiply(tmpQ.setFromAxisAngle(AX, -0.08));   // nose up while climbing to height
+}
+function raceFrozen(){ return race.me && (race.phase === 'lobby' || (race.phase === 'lights' && performance.now() < race.goAt)); }
+
 /* ================= hyperspace (Admin Bike) ================= */
 var HYPER_ADD = 10000 / 3.6;            // +10,000 km/h on entry
 var HYPER_ACC = 5000 / 3.6;             // then keeps speeding up by 5,000 km/h every second (x3 overclocked)
@@ -4920,11 +4955,16 @@ function exitHyper(){
   S.speed = S.horiz = S.hyperSpeed;          // you keep the hyperspace speed!
   takeoff();
   S.vy = 0; S.launchKind = null; S.launchDone = true;
-  if (VD.flight === 'jet') {                 // planes drop out flying level, well clear of the sand
-    S.grounded = false; S.flightT = 0; S.sink = 0; S.angV.set(0, 0, 0);
+  if (S.glued) {                              // drag race: straight back onto the road, keeping every km/h
+    S.yaw = 0; S.vx = 0; S.vz = S.speed; S.vy = 0; S.angV.set(0, 0, 0);
+    if (!VD.flight) { S.grounded = true; S.pos.y = hFull + VD.com; groundQuat(0, AY, 0, S.q); }
+    else { S.grounded = false; S.railH = 5; }
+  } else if (VD.flight === 'jet' || VD.flight === 'heli' || VD.flight === 'rocket') {   // aircraft drop out flying, well clear of the sand
+    S.grounded = false; S.flightT = 0; S.sink = 0; S.angV.set(0, 0, 0); S.rotor = 1; S.engineOn = true;
     if (S.pos.y < hFull + VD.com + 40) S.pos.y = hFull + VD.com + 40;
   }
   var fl = $('flash'); fl.className = 'hud blue'; void fl.offsetWidth; fl.className = 'hud blue show';
+  S.safeT = 3;                                 // 3 s of no-crash so you survive coming out of hyperspace
   toast('DROPPED OUT OF HYPERSPACE · ' + fmt(S.hyperSpeed * 3.6) + ' KM/H KEPT!', '#9fd8ff'); sfx('hyperExit');
 }
 function cancelHyper(){
@@ -4935,8 +4975,11 @@ function stepHyper(dt, inp){
   hyper.t += dt;
   var steer = Math.max(-1, Math.min(1, ((inp.left ? 1 : 0) - (inp.right ? 1 : 0)) + ((inp.rollL ? 1 : 0) - (inp.rollR ? 1 : 0))));
   S.steerS += (steer - S.steerS) * (1 - Math.exp(-5 * dt));
-  S.yaw += S.steerS * 0.7 * dt;
-  hyper.rel = Math.max(4, Math.min(1500, hyper.rel + ((inp.back ? 1 : 0) - (inp.front ? 1 : 0)) * 150 * dt));   // ↓ climb, ↑ dive
+  if (S.glued) { S.yaw = 0; S.steerS = 0; hyper.rel = 1; }      // drag race: straight down the strip, skimming the road
+  else {
+    S.yaw += S.steerS * 0.7 * dt;
+    hyper.rel = Math.max(4, Math.min(1500, hyper.rel + ((inp.back ? 1 : 0) - (inp.front ? 1 : 0)) * 150 * dt));   // ↓ climb, ↑ dive
+  }
   var fx = Math.sin(S.yaw), fz = Math.cos(S.yaw), sp = S.hyperSpeed;
   S.pos.x += fx * sp * dt; S.pos.z += fz * sp * dt;
   // look ahead and rise smoothly over the dunes
@@ -5294,9 +5337,14 @@ function frame(){
       toast(S.overclock ? '⚡ OVERCLOCK ON · ' + ocWhat : 'OVERCLOCK OFF', S.overclock ? '#ff5a3c' : '#ffffff');
       if (S.overclock) { shakeT = Math.max(shakeT, 0.4); missionEvent('overclock', 1); }
     }
-    if ((VD.admin || VD.hyper) && tap('thrust') && !S.glued) { if (hyper.phase === 0) startHyper(); else if (hyper.phase === 2) exitHyper(); }
+    if (tap('thrust') && !raceFrozen()) {
+      var tnow = performance.now(), dbl = tnow - (S.lastShiftTap || 0) < 380; S.lastShiftTap = tnow;
+      // every vehicle can jump to hyperspace; Roadster & Jetpack use Shift for thrusters, so for them it's a double-tap
+      if (hyper.phase === 2) exitHyper();
+      else if (hyper.phase === 0 && (!VD.thrust || dbl)) { if (VD.flight === 'rocket') RA = null; startHyper(); }
+    }
     if (hyper.cool > 0) hyper.cool -= realDt;
-    if (hyper.phase === 1) { hyper.t += realDt; if (hyper.t >= 0.75) { if ((VD.admin || VD.hyper) && !S.crashed) enterHyper(); else hyper.phase = 0; } }
+    if (hyper.phase === 1) { hyper.t += realDt; if (hyper.t >= 0.75) { if (!S.crashed) enterHyper(); else hyper.phase = 0; } }
     else if (hyper.phase === 3) { hyper.t += realDt; if (hyper.t > 0.6) hyper.phase = 0; }
     var wasBoosting = S.boosting;
     S.boosting = !S.crashed && inp.boost && S.boost > 0;
@@ -5307,6 +5355,7 @@ function frame(){
     for (var i = 0; i < n; i++) {
       if (S.crashed) stepCrash(sdt);
       else if (hyper.phase === 2) stepHyper(sdt, inp);
+      else if (S.glued && VD.flight && VD.flight !== 'rocket') stepRail(sdt, inp);
       else if (VD.flight === 'jet') stepJet(sdt, inp);
       else if (VD.flight === 'rocket') stepRocket(sdt, inp);
       else if (VD.flight === 'heli') stepHeli(sdt, inp);
