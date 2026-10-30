@@ -219,6 +219,7 @@ table.pts td:last-child{text-align:right;color:#ffe14d;font-weight:700}
       <tr><td>Dust Devil 🌪️ (drive into a sand tornado) / Tornado Surf (aircraft)</td><td>4,000 / 2,500</td></tr>
       <tr><td>⚡ Random challenges (streak bonus, every 3rd = 🔥 FRENZY x2 for 20 s)</td><td>15,000–30,000</td></tr>
       <tr><td>Biomes: Red Canyon x1.25 · Black Sands x1.5 · Salt Flats = top-speed runs</td><td>x</td></tr>
+      <tr><td>SR-71 Blackbird: hold W, ↓ to take off · F afterburner · O overclock x10 (200,000 km/h!)</td><td>x1.5</td></tr>
       <tr><td>Vehicle bonus: Scooter / Quad / Rally / Monster Truck</td><td>x1.5 / x1.2 / x1.4 / x1.6</td></tr>
     </table>
   </div>
@@ -303,7 +304,8 @@ function keyName(code){
 }
 var keys = {}, pressed = {}, listening = null, paused = true;
 function act(a){ return !!keys[binds[a]]; }
-function tap(a){ return !!pressed[binds[a]]; }
+var tapped = {};
+function tap(a){ return !!tapped[binds[a]]; }
 function fract(x){ return x - Math.floor(x); }
 function hash(a, b){ return fract(Math.sin(a * 127.1 + b * 311.7) * 43758.5453); }
 
@@ -1778,6 +1780,44 @@ function buildJet(){
   return V;
 }
 
+// ---- SR-71 Blackbird: long black spy plane with chines, twin engine nacelles & canted tails ----
+function buildSR71(){
+  var V = { model: new THREE.Group(), wheels: [], steer: [] }, m = V.model;
+  var black = std(0x15161a, 0.45, 0.35), panel = std(0x22242a, 0.55, 0.3), dark = std(0x0c0c0e, 0.5, 0.4), ti = std(0x8a8f96, 0.35, 0.85);
+  var canopyM = new THREE.MeshPhysicalMaterial({ color: 0x9fb8d0, metalness: 0.8, roughness: 0.05, transparent: true, opacity: 0.8, clearcoat: 1 });
+  side([[-12, 1.8], [-12, 2.35], [-3, 2.75], [5, 2.75], [9, 2.5], [14, 2.08], [9, 1.88], [-3, 1.72], [-12, 1.75]], 1.3, black, m, 0, 0.1);
+  side([[-11, 2.3], [-3, 2.85], [4.6, 2.85], [4.6, 2.7], [-3, 2.7]], 0.5, panel, m, 0, 0.04);
+  [-1, 1].forEach(function(s){
+    flatPart([[0.5, 13.5], [2.0, 6], [2.8, 0], [0.5, 0]], 0.12, black, m, 1.98, s < 0);                 // nose chines
+    flatPart([[0.5, 3], [3.2, 0.5], [8.2, -7.6], [8.2, -9.6], [0.5, -10.2]], 0.16, black, m, 1.95, s < 0);   // delta wing
+    rod(v(s * 3.3, 2.1, 3.6), v(s * 3.3, 2.1, -10.0), 0.82, black, m, 20, 0.7);                         // engine nacelle
+    mesh(new THREE.ConeGeometry(0.62, 2.6, 18), ti, m, s * 3.3, 2.1, 4.6, Math.PI / 2);                    // intake spike
+    mesh(new THREE.TorusGeometry(0.72, 0.1, 8, 24), dark, m, s * 3.3, 2.1, 3.6);
+    mesh(new THREE.TorusGeometry(0.66, 0.08, 8, 24), glow(0xff8a2a, 1.4), m, s * 3.3, 2.1, -10.02);
+    var fin = grp(m, s * 3.3, 2.75, 0); fin.rotation.z = s * 0.26;                                       // tails lean inwards
+    side([[-6.0, 0], [-8.4, 3.1], [-9.7, 3.1], [-9.6, 0]], 0.14, black, fin, 0, 0);
+    box(0.04, 0.04, 5.5, glow(0xff3b3b, 1.0), m, s * 8.15, 2.06, -8.6);
+  });
+  var canopy = mesh(new THREE.SphereGeometry(1, 24, 16), canopyM, m, 0, 2.86, 7.2); canopy.scale.set(0.5, 0.38, 1.6);
+  V.boostFlame = flame(m, 3.3, 2.1, -10.1, BLUE_FLAME, true, 2.4);
+  V.boostFlame2 = flame(m, -3.3, 2.1, -10.1, BLUE_FLAME, true, 2.4);
+  V.exhaust = [3.3, 2.1, -11.0];
+  V.gear = grp(m);
+  var rub = rubberMat(), strut = std(0xbfc4ca, 0.3, 0.9);
+  [[0, 8.5, 0.42], [2.2, -2.5, 0.5], [-2.2, -2.5, 0.5]].forEach(function(p){
+    rod(v(p[0], p[2], p[1]), v(p[0] * 0.8, 1.8, p[1]), 0.08, strut, V.gear, 8);
+    var wg = grp(V.gear, p[0], p[2], p[1]), sp = grp(wg);
+    mesh(new THREE.CylinderGeometry(p[2], p[2], 0.3, 18), rub, sp, 0, 0, 0, 0, 0, Math.PI / 2);
+    V.wheels.push({ g: sp, r: p[2] });
+  });
+  V.rider = makeRider({ suit: 0xd8a640, pants: 0xd8a640, accent: 0xffffff, helmet: 0xf2f2f2, lens: 0x222222, number: '71' });
+  V.rider.root.position.set(0, 2.3, 7.0); V.riderY = 2.3; V.rider.root.scale.setScalar(0.85);
+  m.add(V.rider.root);
+  V.paint = [black];
+  V.dust = [[0, 0, -2.0]];
+  return V;
+}
+
 // ---- Dune Buggy: tube-frame sand rail with big paddle tyres at the back ----
 function buildBuggy(){
   var V = { model: new THREE.Group(), wheels: [], steer: [] }, m = V.model;
@@ -1928,7 +1968,12 @@ VDEF.heli = { name: 'Helicopter', icon: '🚁', desc: 'Flips & rolls · O overcl
   accel: 0, turn: 0, flip: 0, roll: 0, spin: 0, com: 0.1, lean: 0, pts: 1.2, style: false, jump: 0,
   camDist: 16, camH: 5, look: 1.5, width: 2.4, crashRest: 1.2, shadow: 16, blob: [4, 8], sound: 'heli', fpv: [0, 2.35, 0.75],
   pose: { torso: -0.25, sX: -1.15, sZ: 0.12, el: 0.25, hLX: -1.4, hLZ: 0.1, kL: 0.35, hRX: -1.4, hRZ: 0.1, kR: 0.35, lift: 0 } };
-var VEH_ORDER = ['bike', 'scooter', 'quad', 'buggy', 'car', 'monster', 'jetpack', 'roadster', 'heli', 'jet', 'rocket', 'admin'];
+VDEF.sr71 = { name: 'SR-71 Blackbird', icon: '🛩️', desc: 'Mach 30+ spy plane · F afterburner · O = x10', build: buildSR71, flight: 'jet',
+  jt: 320, jtIdle: 20, jtBoost: 480, jtOc: 10, jDrag: 2.6e-6, groundThrust: 40,
+  accel: 20, turn: 1, flip: 0, roll: 0, spin: 0, com: 2.0, lean: 0, pts: 1.5, style: false, jump: 0,
+  camDist: 30, camH: 6, look: 2.5, width: 7, crashRest: 1.5, shadow: 34, blob: [16, 26], sound: 'jet', fpv: [0, 3.0, 7.6],
+  pose: { torso: -0.3, sX: -1.1, sZ: 0.15, el: 0.4, hLX: -1.4, hLZ: 0.1, kL: 0.4, hRX: -1.4, hRZ: 0.1, kR: 0.4, lift: 0 } };
+var VEH_ORDER = ['bike', 'scooter', 'quad', 'buggy', 'car', 'monster', 'jetpack', 'roadster', 'heli', 'jet', 'sr71', 'rocket', 'admin'];
 VEH_ORDER.forEach(function(key){
   var d = VDEF[key]; d.obj = d.build();
   d.obj.model.visible = false;
@@ -2388,9 +2433,10 @@ function countFlightTricks(){
 
 function stepJet(dt, inp){
   var fwd = tmpV.set(0, 0, 1).applyQuaternion(S.q);
-  var thrust = ((inp.thr ? 26 : 6) + (S.boosting ? 30 : 0)) * (S.overclock ? 6 : 1);
-  if (inp.brk) S.speed = Math.max(0, S.speed - 22 * dt);
-  S.speed += (thrust - 2.6e-4 * S.speed * S.speed - 9.8 * fwd.y) * dt;   // tops out near Mach 0.9, past Mach 1.3 with afterburner
+  var thrust = ((inp.thr ? (VD.jt || 26) : (VD.jtIdle || 6)) + (S.boosting ? (VD.jtBoost || 30) : 0)) * (S.overclock ? (VD.jtOc || 6) : 1);
+  if (S.grounded && VD.groundThrust) thrust = Math.min(thrust, VD.groundThrust);      // the SR-71 only goes crazy once it's airborne
+  if (inp.brk) S.speed = Math.max(0, S.speed - (VD.jDrag ? 22 + S.speed * 0.6 : 22) * dt);
+  S.speed += (thrust - (VD.jDrag || 2.6e-4) * S.speed * S.speed - 9.8 * fwd.y) * dt;   // tops out near Mach 0.9, past Mach 1.3 with afterburner
   if (S.speed < 0) S.speed = 0;
   S.roar = (inp.thr ? 0.05 : 0.02) + (S.boosting ? 0.1 : 0);
   var ctrl = Math.min(1, S.speed / 55);
@@ -3513,7 +3559,7 @@ function netConnect(){
   catch (e) { netRetry(); return; }
   net.ws = ws; net.status = 'connecting'; netStatus();
   ws.onopen = function(){ net.ok = true; net.tries = 0; netSend({ t: 'hello', name: netName() }); };
-  ws.onmessage = function(ev){ var m; try { m = JSON.parse(ev.data); } catch (e) { return; } netMessage(m); };
+  ws.onmessage = function(ev){ var m; try { m = JSON.parse(ev.data); } catch (e) { return; } try { netMessage(m); } catch (e) { netError(e); } };
   ws.onclose = function(){ net.ok = false; net.ws = null; net.id = null; netClearPlayers(); netRetry(); };
   ws.onerror = function(){ try { ws.close(); } catch (e) {} };
 }
@@ -3638,7 +3684,11 @@ function drawNetList(){
   if (arr.length) h += '<div class="tip">' + keyName(binds.joinFriend) + ' = go to a player</div>';
   netListEl.innerHTML = h; netListEl.style.display = 'block';
 }
+var joinCool = 0;
+function netError(e){ if (!net.errShown) { net.errShown = true; console.error('multiplayer error', e); } }
 function joinFriend(){
+  if (performance.now() < joinCool) return;            // one warp per key press, max ~1 a second
+  joinCool = performance.now() + 900;
   var arr = Array.from(net.players.values()).filter(function(p){ return p.snaps.length && p.root.visible; });
   if (!arr.length) { toast(net.status === 'online' ? 'Nobody else is riding right now' : 'Not connected to the lobby', '#ff9a3c'); return; }
   var p = arr[net.joinIdx++ % arr.length], s = p.snaps[p.snaps.length - 1];
@@ -3706,6 +3756,7 @@ var MISSIONS = [
   { id: 'arch3', text: 'Thread 3 stone arches', need: 3, ev: 'arch', xp: 500 },
   { id: 'overclock', text: 'Overclock a vehicle (O)', need: 1, ev: 'overclock', xp: 200 },
   { id: 'speed20k', text: 'Reach 20,000 km/h', need: 1, ev: 'speed', min: 20000, xp: 500 },
+  { id: 'sr71', text: 'Fly the SR-71 at 100,000 km/h', need: 1, ev: 'speed', min: 100000, xp: 600 },
   { id: 'boosterland', text: 'Land the Moon Rocket on the pad (press Q in flight)', need: 1, ev: 'boosterland', xp: 600 },
   { id: 'bullseye', text: 'Land the rocket within 1.5 m of the pad centre', need: 1, ev: 'bullseye', xp: 800 },
   { id: 'helitouch', text: 'Fly the helicopter and land it again', need: 1, ev: 'helitouch', xp: 300 },
@@ -3995,7 +4046,7 @@ function drawMinimap(){
     mm.beginPath(); mm.moveTo(a[0], a[1]); mm.lineTo(b[0], b[1]); mm.stroke();
   });
   drawVarietyMap(px, C);
-  drawNetMap(px, C);
+  try { drawNetMap(px, C); } catch (e) { netError(e); }
   mm.restore();
   mm.beginPath(); mm.moveTo(C, C - 16); mm.lineTo(C + 11, C + 12); mm.lineTo(C, C + 6); mm.lineTo(C - 11, C + 12); mm.closePath();
   mm.fillStyle = '#ffffff'; mm.fill(); mm.lineWidth = 3; mm.strokeStyle = '#ff4433'; mm.stroke();
@@ -4714,6 +4765,7 @@ var _p = new V3(), _q = new THREE.Quaternion();
 
 function frame(){
   requestAnimationFrame(frame);
+  tapped = pressed; pressed = {};          // each key press counts once, even if something below goes wrong
   var realDt = Math.min(0.05, clock.getDelta());
   var inp = paused ? emptyInput : readInput();
   var timeScale = (!paused && (act('slowmo') || (RA && RA.slow))) ? 0.35 : 1;
@@ -4735,7 +4787,7 @@ function frame(){
     if (RA && RA.phase === 'done') { RA.doneT += realDt; if (RA.doneT > 4) RA = null; }
     if (tap('overclock')) {
       S.overclock = !S.overclock; sfx(S.overclock ? 'overclock' : 'overclockOff');
-      var ocWhat = VD.flight === 'heli' ? 'rotor x6 · faster flips' : VD.flight === 'jet' ? 'engines x6 · snappier' : VD.flight === 'rocket' ? 'engines x3' : VD.thrust ? 'motor & boost x10 · thrusters x3' : 'motor & boost x10';
+      var ocWhat = VD.flight === 'heli' ? 'rotor x6 · faster flips' : VD.key === 'sr71' ? 'engines x10 · hold on!' : VD.flight === 'jet' ? 'engines x6 · snappier' : VD.flight === 'rocket' ? 'engines x3' : VD.thrust ? 'motor & boost x10 · thrusters x3' : 'motor & boost x10';
       toast(S.overclock ? '⚡ OVERCLOCK ON · ' + ocWhat : 'OVERCLOCK OFF', S.overclock ? '#ff5a3c' : '#ffffff');
       if (S.overclock) { shakeT = Math.max(shakeT, 0.4); missionEvent('overclock', 1); }
     }
@@ -4862,6 +4914,7 @@ function frame(){
   var rearOn = Math.max(S.boostVis, S.overclock && inp.thr && !paused && !S.crashed && VD.flight !== 'rocket' ? 0.7 : 0, VD.thrust && !S.grounded && inp.thr && !paused ? 0.9 : 0, VD.flight === 'jet' && !paused && !S.crashed ? (inp.thr ? 0.55 : 0.2) : 0, VD.flight === 'heli' && S.overclock && !S.grounded && !paused ? 0.9 : 0);
   var bv = Math.max(0.001, rearOn * flick);
   VD.obj.boostFlame.scale.set(bv, bv * (0.9 + Math.random() * 0.5), bv);
+  if (VD.obj.boostFlame2) VD.obj.boostFlame2.scale.copy(VD.obj.boostFlame.scale);
   if (S.boostVis > 0.3 && !paused && VD.flight !== 'rocket') {
     var back = tmpV.set(0, 0, -1).applyQuaternion(S.q);
     _p.set(VD.obj.exhaust[0], VD.obj.exhaust[1] - VD.com, VD.obj.exhaust[2]).applyQuaternion(S.q).add(S.pos);
@@ -4912,7 +4965,7 @@ function frame(){
 
   updateWildlife(dt);
   if (!paused) updateVariety(dt, hs);
-  updateNet(realDt);
+  try { updateNet(realDt); } catch (e) { netError(e); }
   updateClouds(realDt);
   if (windSand.visible) updateWindSand(realDt);
   if (!paused) updateTracks();
@@ -4947,7 +5000,6 @@ function frame(){
   drawMinimap();
   updateHUD();
   updateAudio(inp.thr, kmh, timeScale);
-  pressed = {};
   if (composer && prefs.quality === 'high') composer.render(); else renderer.render(scene, camera);
 }
 frame();
