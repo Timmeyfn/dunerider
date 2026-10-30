@@ -1,0 +1,12 @@
+name = "dune-rider"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+# Multiplayer: one shared lobby that everyone joins
+[[durable_objects.bindings]]
+name = "LOBBY"
+class_name = "Lobby"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Lobby"]
