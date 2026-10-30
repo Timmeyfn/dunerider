@@ -52,6 +52,20 @@ canvas#gl{display:block}
 #netList b{color:#ffe14d}
 #netList .me{opacity:.7}
 #netList .tip{font-size:11px;opacity:.75}
+#f1{top:96px;left:50%;transform:translateX(-50%);display:none;gap:14px;background:rgba(10,10,14,.85);padding:12px 16px;border-radius:14px}
+#f1 i{display:block;width:38px;height:38px;border-radius:50%;background:#3a0606;box-shadow:inset 0 0 6px #000}
+#f1 i.on{background:#ff2020;box-shadow:0 0 18px #ff2020,inset 0 0 6px #ff9a9a}
+#raceHud{top:150px;left:50%;transform:translateX(-50%);display:none;text-align:center;font-size:30px;color:#ffe14d;text-shadow:0 3px 0 #2a0a4a,0 0 12px rgba(0,0,0,.6);white-space:nowrap}
+#raceHud .big{font-size:52px;color:#fff}
+#raceHud small{display:block;font-family:system-ui,sans-serif;font-size:15px;color:#fff;margin-top:2px}
+#raceRes{top:50%;left:50%;transform:translate(-50%,-50%);display:none;min-width:360px;background:rgba(14,10,30,.88);border:3px solid #ffe14d;border-radius:16px;padding:16px 22px;font-family:system-ui,sans-serif;font-size:16px}
+#raceRes .rt{font-family:'Luckiest Guy',Impact,sans-serif;font-size:32px;color:#ffe14d;text-align:center;margin-bottom:8px}
+#raceRes .rt2{font-family:'Luckiest Guy',Impact,sans-serif;font-size:20px;color:#36e0ff;text-align:center;margin:12px 0 4px}
+#raceRes .rr{display:flex;justify-content:space-between;gap:20px;padding:4px 8px;border-radius:8px}
+#raceRes .rr.me{background:rgba(255,225,77,.18)}
+#raceRes .rr.rec{font-size:20px;color:#ffe14d}
+#raceRes .rr.small{font-size:13px;opacity:.8}
+#raceRes .tip{font-size:12px;opacity:.7;text-align:center;margin-top:10px}
 #alt{top:66px;left:50%;transform:translateX(-50%);font-size:22px;color:#b6f3ff;display:none;text-shadow:0 2px 0 #0a2a4a,0 0 10px rgba(0,0,0,.5);white-space:nowrap}
 #trickBox{top:15%;left:50%;transform:translateX(-50%);text-align:center;display:none}
 #trickBox.bump{animation:bump .25s ease-out}
@@ -152,6 +166,9 @@ table.pts td:last-child{text-align:right;color:#ffe14d;font-weight:700}
 <div id="chal" class="hud"><div id="chalT" class="ct"></div><div class="cb"><i id="chalB"></i></div><div id="chalS" class="cs"></div></div>
 <div id="compass" class="hud"></div>
 <div id="netList" class="hud"></div>
+<div id="f1" class="hud"></div>
+<div id="raceHud" class="hud"></div>
+<div id="raceRes" class="hud"></div>
 <div id="vehChip" class="hud"></div>
 <div id="missions" class="hud"></div>
 <div id="trickBox" class="hud"><div id="trickList"></div><div id="trickPts"></div><div id="airTime"></div></div>
@@ -173,7 +190,7 @@ table.pts td:last-child{text-align:right;color:#ffe14d;font-weight:700}
     <p class="sub">Desert stunts · no speed limit · giant dunes, ramps &amp; pyramids · trick combos</p>
     <div class="row"><button id="playBtn" class="big">RIDE</button><div id="modeRow" class="row" style="margin:0"></div></div>
     <h2>Multiplayer <small>one big lobby · everyone who opens this site rides together</small></h2>
-    <div class="row" style="margin-top:0;align-items:center"><input id="nameIn" maxlength="16" placeholder="Your name" autocomplete="off"><span id="netStat" style="font-family:system-ui,sans-serif;font-size:14px">🟡 Connecting…</span></div>
+    <div class="row" style="margin-top:0;align-items:center"><input id="nameIn" maxlength="16" placeholder="Your name" autocomplete="off"><span id="netStat" style="font-family:system-ui,sans-serif;font-size:14px">🟡 Connecting…</span><button id="dragBtn" class="chip">🏁 Drag Strip</button></div>
     <h2>Vehicle <small>or press V while riding</small></h2>
     <div id="vehicles" class="grid3"></div>
     <h2>Paint <small>level up to unlock Gold (LV 5), Chrome (LV 10) and Rainbow (LV 15)</small></h2>
@@ -219,7 +236,10 @@ table.pts td:last-child{text-align:right;color:#ffe14d;font-weight:700}
       <tr><td>Dust Devil 🌪️ (drive into a sand tornado) / Tornado Surf (aircraft)</td><td>4,000 / 2,500</td></tr>
       <tr><td>⚡ Random challenges (streak bonus, every 3rd = 🔥 FRENZY x2 for 20 s)</td><td>15,000–30,000</td></tr>
       <tr><td>Biomes: Red Canyon x1.25 · Black Sands x1.5 · Salt Flats = top-speed runs</td><td>x</td></tr>
-      <tr><td>SR-71 Blackbird: hold W, ↓ to take off · F afterburner · O overclock x10 (200,000 km/h!)</td><td>x1.5</td></tr>
+      <tr><td>SR-71 Blackbird: hold W (lifts off by itself) · F afterburner · Shift hyperspace · O overclock x10 (2,000,000 km/h!)</td><td>x1.5</td></tr>
+      <tr><td>🏁 Drag race (Y or the menu button): win / new all-time record · lights out = GO!</td><td>🏆</td></tr>
+      <tr><td>Missile (M) blows up another player / smash into a slower player</td><td>5,000 / 3,000</td></tr>
+      <tr><td>X = jump out of your vehicle (you get the jetpack) · X next to it = get back in · H = horn</td><td>🚶</td></tr>
       <tr><td>Vehicle bonus: Scooter / Quad / Rally / Monster Truck</td><td>x1.5 / x1.2 / x1.4 / x1.6</td></tr>
     </table>
   </div>
@@ -270,7 +290,11 @@ var ACTIONS = [
   ['build','Build: place item','KeyB'],
   ['buildNext','Build: next item','KeyN'],
   ['buildClear','Build: clear all','KeyK'],
-  ['joinFriend','Multiplayer: go to a player','KeyJ']
+  ['joinFriend','Multiplayer: go to a player','KeyJ'],
+  ['exitVeh','Jump out / get back in','KeyX'],
+  ['missile','Fire a missile','KeyM'],
+  ['horn','Horn','KeyH'],
+  ['dragStrip','Drag strip: join / leave a race','KeyY']
 ];
 var DEFAULT_BINDS = {};
 ACTIONS.forEach(function(a){ DEFAULT_BINDS[a[0]] = a[2]; });
@@ -497,6 +521,9 @@ function flameDecalTex(){
 
 /* ================= terrain: dunes + ramps + pyramids ================= */
 // gentle climb to a sharp crest (launches you), then a long smooth downhill back to land on (Dune!-style)
+// the drag strip: a dead-straight, perfectly flat road along +z at x = STRIP_X that never ends
+var STRIP_X = 6000, STRIP_H = 12, LANE_W = 6.5;
+function nearStrip(x, pad){ return Math.abs(x - STRIP_X) < 45 + (pad || 0); }
 function duneProfile(p){ return p < 0.55 ? Math.pow(p / 0.55, 1.5) : Math.pow((1 - p) / 0.45, 1.35); }
 function duneHeight(x, z){
   // big rolling base
@@ -583,7 +610,7 @@ function oasisAt(i, j){
   if (o !== undefined) return o;
   o = null;
   var hh = hash(i * 5.3 + 2.9, j * 4.1 - 1.3);
-  if (hh > 0.45 && !(i >= -1 && i <= 0 && j >= -1 && j <= 0)) {
+  if (hh > 0.45 && !(i >= -1 && i <= 0 && j >= -1 && j <= 0) && Math.abs((i + 0.5) * OASIS_CELL - STRIP_X) > OASIS_CELL / 2 + 300) {
     var cx = (i + 0.3 + hash(i + 1.2, j + 8.4) * 0.4) * OASIS_CELL, cz = (j + 0.3 + hash(i - 7.4, j + 2.2) * 0.4) * OASIS_CELL;
     var R = 14 + hash(i + 3.3, j - 3.3) * 10, p = pyrAt(Math.floor(cx / PYR_CELL), Math.floor(cz / PYR_CELL));
     if (!p || Math.max(Math.abs(cx - p.x), Math.abs(cz - p.z)) > p.B + R * 2.6 + 20) {
@@ -604,6 +631,8 @@ function baseHeight(x, z){
       h = target * (1 - t) + h * t;
     }
   }
+  var sd = Math.abs(x - STRIP_X);
+  if (sd < 240) { var st = smooth01(LANE_W * 4 + 14, 240, sd); h = STRIP_H * (1 - st) + h * st; }
   return h;
 }
 function nearOasis(x, z, pad){
@@ -621,7 +650,7 @@ function rampAt(i, j){
     var sc = 0.8 + hash(i + 9.9, j - 3.3) * 0.9, a = hash(i - 8.8, j + 8.8) * TAU, L = 14 * sc;
     // the ramp starts flush with the sand at its entry so you roll straight onto it
     var base = baseHeight(cx - Math.sin(a) * L / 2, cz - Math.cos(a) * L / 2);
-    if (!nearOasis(cx, cz, 25)) r = { i: i, j: j, x: cx, z: cz, a: a, sa: Math.sin(a), ca: Math.cos(a), L: L, W: 6.5 + sc * 2.5, H: 4.5 * sc, base: base };
+    if (!nearOasis(cx, cz, 25) && !nearStrip(cx, 260)) r = { i: i, j: j, x: cx, z: cz, a: a, sa: Math.sin(a), ca: Math.cos(a), L: L, W: 6.5 + sc * 2.5, H: 4.5 * sc, base: base };
   }
   rampCache.set(key, r); return r;
 }
@@ -633,7 +662,7 @@ function pyrAt(i, j){
     var cx = (i + 0.3 + hash(i + 6.1, j - 2.7) * 0.4) * PYR_CELL, cz = (j + 0.3 + hash(i - 1.9, j + 7.3) * 0.4) * PYR_CELL;
     var B = 60 + hash(i + 4.2, j + 4.2) * 55, k7 = B * 0.7;
     var pbase = Math.min(duneHeight(cx, cz), duneHeight(cx + k7, cz + k7), duneHeight(cx - k7, cz + k7), duneHeight(cx + k7, cz - k7), duneHeight(cx - k7, cz - k7));
-    p = { i: i, j: j, x: cx, z: cz, B: B, H: B * 0.8, base: pbase };   // sits on the lowest corner so it never floats
+    if (Math.abs(cx - STRIP_X) > B + 260) p = { i: i, j: j, x: cx, z: cz, B: B, H: B * 0.8, base: pbase };   // sits on the lowest corner so it never floats
   }
   pyrCache.set(key, p); return p;
 }
@@ -783,7 +812,7 @@ function placeScatter(cx, cz){
         var px, pz, h1 = hash(i, j), h2 = hash(i + 31.7, j - 5.3), h3 = hash(i - 13.1, j + 21.9);
         if (h1 > 0.6 && nc < pools.cactus.length) {
           px = (i + hash(i + 7.1, j)) * CC; pz = (j + hash(i, j + 3.3)) * CC;
-          if (px * px + pz * pz > 900 && !featureKind(px, pz) && !nearOasis(px, pz, 4) && !nearRock(px, pz, 12)) {
+          if (px * px + pz * pz > 900 && !featureKind(px, pz) && !nearOasis(px, pz, 4) && !nearRock(px, pz, 12) && !nearStrip(px, 10)) {
             var sc = 0.75 + hash(i + 1.7, j + 9.2) * 0.7, c = pools.cactus[nc++], py = baseHeight(px, pz) - 0.25;
             c.position.set(px, py, pz); c.rotation.y = h1 * 40; c.scale.setScalar(sc); c.visible = true;
             cacList.push({ x: px, y: py, z: pz, r: 0.5 * sc, h: 4.4 * sc, mesh: c });
@@ -792,7 +821,7 @@ function placeScatter(cx, cz){
         if (h2 > 0.35) {
           for (var q = 0; q < 2 && nr < pools.rock.length; q++) {
             px = (i + hash(i + q * 3.7, j + 1.1)) * CC; pz = (j + hash(i + 2.2, j + q * 5.9)) * CC;
-            if (featureKind(px, pz)) continue;
+            if (featureKind(px, pz) || nearStrip(px, 5)) continue;
             var rs = 0.35 + hash(i + q, j - q) * hash(j, i + q) * 2.2, rk = pools.rock[nr++];
             rk.position.set(px, baseHeight(px, pz) - rs * 0.25, pz);
             rk.scale.set(rs * 1.3, rs * 0.7, rs); rk.rotation.set(h2 * 5, h2 * 17 + q, 0); rk.visible = true;
@@ -801,7 +830,7 @@ function placeScatter(cx, cz){
         if (h3 > 0.3) {
           for (var w = 0; w < 2 && ns < pools.shrub.length; w++) {
             px = (i + hash(i + w * 9.1, j + 4.4)) * CC; pz = (j + hash(i + 6.6, j + w * 2.3)) * CC;
-            if (featureKind(px, pz)) continue;
+            if (featureKind(px, pz) || nearStrip(px, 5)) continue;
             var sh = pools.shrub[ns++];
             sh.position.set(px, baseHeight(px, pz) - 0.1, pz); sh.rotation.y = h3 * 9 + w; sh.scale.setScalar(0.7 + h3); sh.visible = true;
           }
@@ -862,7 +891,7 @@ function rockAt(i, j){
   var hh = hash(i * 2.7 - 5.1, j * 3.9 + 8.3);
   if (hh > 0.42 && !(i >= -1 && i <= 0 && j >= -1 && j <= 0)) {
     var cx = (i + 0.25 + hash(i + 3.1, j - 6.2) * 0.5) * ROCK_CELL, cz = (j + 0.25 + hash(i - 2.6, j + 4.4) * 0.5) * ROCK_CELL;
-    var clear = function(x, z, pad){ return !featureKind(x, z) && !nearOasis(x, z, pad); };
+    var clear = function(x, z, pad){ return !featureKind(x, z) && !nearOasis(x, z, pad) && !nearStrip(x, pad + 30); };
     r = { i: i, j: j, x: cx, z: cz, arch: null, spires: [] };
     if (hh > 0.76) {                                 // try a stone arch on flat-ish ground (several spots and angles)
       var Sx = 11 + hash(i, j + 2.2) * 9, Hh = 14 + hash(i + 2.2, j) * 14;
@@ -1818,6 +1847,49 @@ function buildSR71(){
   return V;
 }
 
+// ---- Top Fuel Dragster: long skinny nose, giant rear slicks, blower, headers & a big rear wing ----
+function buildDragster(){
+  var V = { model: new THREE.Group(), wheels: [], steer: [] }, m = V.model;
+  var paint = clearcoat(0xffd21a, 0.35, 0.3), black = std(0x141417, 0.7), alu = std(0xd4d8de, 0.25, 0.95), dark = std(0x2b2d31, 0.45, 0.6), rubber = rubberMat(), rimM = std(0xc8ccd2, 0.25, 0.95);
+  rod(v(0.22, 0.32, 4.3), v(0.3, 0.36, -1.9), 0.035, alu, m, 8); rod(v(-0.22, 0.32, 4.3), v(-0.3, 0.36, -1.9), 0.035, alu, m, 8);
+  side([[-0.3, 0.3], [-0.3, 0.62], [1.2, 0.55], [4.6, 0.38], [4.6, 0.3]], 0.42, paint, m, 0, 0.04);              // the long needle nose
+  box(0.62, 0.42, 1.0, dark, m, 0, 0.62, -0.55);                                                                 // engine block
+  box(0.42, 0.26, 0.7, alu, m, 0, 0.97, -0.55);                                                                  // supercharger
+  box(0.5, 0.22, 0.38, black, m, 0, 1.2, -0.45, -0.25);                                                          // scoop
+  [-1, 1].forEach(function(s){
+    for (var k = 0; k < 4; k++) {
+      var z = -0.2 - k * 0.23;
+      rod(v(s * 0.32, 0.62, z), v(s * 0.62, 0.95, z - 0.05), 0.035, alu, m, 8);
+      mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 8), glow(0xff7a22, 1.2), m, s * 0.63, 0.97, z - 0.05);
+    }
+  });
+  side([[-1.25, 0.3], [-1.25, 0.95], [-0.9, 1.05], [-0.9, 0.3]], 0.66, black, m, 0, 0.04);                     // cockpit tub
+  var cage = std(0x1d2733, 0.35, 0.6);
+  rod(v(0.3, 0.95, -0.95), v(0.2, 1.45, -1.15), 0.03, cage, m, 6); rod(v(-0.3, 0.95, -0.95), v(-0.2, 1.45, -1.15), 0.03, cage, m, 6);
+  rod(v(0.2, 1.45, -1.15), v(-0.2, 1.45, -1.15), 0.03, cage, m, 6);
+  // rear wing on tall struts
+  rod(v(0.35, 0.5, -1.9), v(0.4, 1.9, -2.5), 0.04, black, m, 8); rod(v(-0.35, 0.5, -1.9), v(-0.4, 1.9, -2.5), 0.04, black, m, 8);
+  box(1.9, 0.07, 0.75, paint, m, 0, 1.95, -2.55, 0.25); box(1.9, 0.05, 0.4, black, m, 0, 1.72, -2.45, 0.35);
+  box(0.04, 0.7, 0.95, black, m, 0.96, 1.85, -2.55); box(0.04, 0.7, 0.95, black, m, -0.96, 1.85, -2.55);
+  box(0.9, 0.06, 0.35, paint, m, 0, 0.42, 4.15);                                                                 // little front wing
+  box(0.22, 0.22, 0.4, black, m, 0, 0.5, -2.05);                                                                 // parachute pack
+  [[0.42, 4.0, 0.24, 0.1, false], [-0.42, 4.0, 0.24, 0.1, false], [0.88, -1.45, 0.62, 0.58, true], [-0.88, -1.45, 0.62, 0.58, true]].forEach(function(w){
+    var holder = grp(m, w[0], w[2], w[1]), spin = grp(holder);
+    tire(w[2], w[3], rubber, spin, 0); discRim(w[2] * 0.62, w[3], Math.sign(w[0]), rimM, dark, spin);
+    V.wheels.push({ g: spin, r: w[2] });
+    if (!w[4]) V.steer.push(holder);
+  });
+  V.rider = makeRider({ suit: 0xd8262e, pants: 0xd8262e, accent: 0xffd21a, helmet: 0x111111, lens: 0xffd21a, number: '1' });
+  V.rider.root.position.set(0, 0.3, -1.05); V.riderY = 0.3; V.rider.root.scale.setScalar(0.92);
+  m.add(V.rider.root);
+  V.boostFlame = flame(m, 0.63, 1.0, -0.6, ORANGE_FLAME, true, 0.55); V.boostFlame.rotation.x = -0.9;
+  V.boostFlame2 = flame(m, -0.63, 1.0, -0.6, ORANGE_FLAME, true, 0.55); V.boostFlame2.rotation.x = -0.9;
+  V.exhaust = [0, 0.6, -2.4];
+  V.paint = [paint];
+  V.dust = [[0.88, 0, -1.45], [-0.88, 0, -1.45]];
+  return V;
+}
+
 // ---- Dune Buggy: tube-frame sand rail with big paddle tyres at the back ----
 function buildBuggy(){
   var V = { model: new THREE.Group(), wheels: [], steer: [] }, m = V.model;
@@ -1968,12 +2040,16 @@ VDEF.heli = { name: 'Helicopter', icon: '🚁', desc: 'Flips & rolls · O overcl
   accel: 0, turn: 0, flip: 0, roll: 0, spin: 0, com: 0.1, lean: 0, pts: 1.2, style: false, jump: 0,
   camDist: 16, camH: 5, look: 1.5, width: 2.4, crashRest: 1.2, shadow: 16, blob: [4, 8], sound: 'heli', fpv: [0, 2.35, 0.75],
   pose: { torso: -0.25, sX: -1.15, sZ: 0.12, el: 0.25, hLX: -1.4, hLZ: 0.1, kL: 0.35, hRX: -1.4, hRZ: 0.1, kR: 0.35, lift: 0 } };
-VDEF.sr71 = { name: 'SR-71 Blackbird', icon: '🛩️', desc: 'Mach 30+ spy plane · F afterburner · O = x10', build: buildSR71, flight: 'jet',
-  jt: 320, jtIdle: 20, jtBoost: 480, jtOc: 10, jDrag: 2.6e-6, groundThrust: 40,
+VDEF.drag = { name: 'Top Fuel Dragster', icon: '🏁', desc: 'King of the drag strip · insane launch', build: buildDragster,
+  accel: 140, taper: false, boostAcc: 120, turn: 1.3, flip: 3.6, roll: 4, spin: 4, com: 0.5, lean: -0.03, pts: 1.3, style: false, jump: 6, wheelieA: 0.12,
+  camDist: 11, camH: 3.2, look: 1.0, width: 1.0, crashRest: 0.6, shadow: 14, blob: [2.4, 6.4], sound: 'car', fpv: [0, 1.2, -1.0],
+  pose: { torso: -0.55, sX: -1.15, sZ: 0.12, el: 0.25, hLX: -1.5, hLZ: 0.1, kL: 0.2, hRX: -1.5, hRZ: 0.1, kR: 0.2, lift: 0 } };
+VDEF.sr71 = { name: 'SR-71 Blackbird', icon: '🛩️', desc: 'Mach 300+ · Shift = hyperspace · O = x10', build: buildSR71, flight: 'jet',
+  jt: 3200, jtIdle: 20, jtBoost: 4800, jtOc: 10, jDrag: 2.6e-7, groundThrust: 40, hyper: true,
   accel: 20, turn: 1, flip: 0, roll: 0, spin: 0, com: 2.0, lean: 0, pts: 1.5, style: false, jump: 0,
   camDist: 30, camH: 6, look: 2.5, width: 7, crashRest: 1.5, shadow: 34, blob: [16, 26], sound: 'jet', fpv: [0, 3.0, 7.6],
   pose: { torso: -0.3, sX: -1.1, sZ: 0.15, el: 0.4, hLX: -1.4, hLZ: 0.1, kL: 0.4, hRX: -1.4, hRZ: 0.1, kR: 0.4, lift: 0 } };
-var VEH_ORDER = ['bike', 'scooter', 'quad', 'buggy', 'car', 'monster', 'jetpack', 'roadster', 'heli', 'jet', 'sr71', 'rocket', 'admin'];
+var VEH_ORDER = ['bike', 'scooter', 'quad', 'buggy', 'car', 'monster', 'drag', 'jetpack', 'roadster', 'heli', 'jet', 'sr71', 'rocket', 'admin'];
 VEH_ORDER.forEach(function(key){
   var d = VDEF[key]; d.obj = d.build();
   d.obj.model.visible = false;
@@ -2131,7 +2207,7 @@ function stepGround(dt, inp){
   var pull = oc * (VD.taper === false ? VD.accel * 0.75 : VD.accel * 0.75 * (0.3 + 0.7 / (1 + kmhNow / 180)));
   if (inp.thr) S.speed += (S.speed < 0 ? 16 : pull) * dt;
   if (VD.maxSpeed && S.speed > VD.maxSpeed) S.speed -= (S.speed - VD.maxSpeed) * Math.min(1, 3 * dt);   // running pace
-  if (S.boosting) S.speed += (VD.admin ? 45 : 17) * oc * dt;
+  if (S.boosting) S.speed += (VD.admin ? 45 : (VD.boostAcc || 17)) * oc * dt;
   if (inp.brk) {
     if (S.speed > 0.3) S.speed = Math.max(0, S.speed - (VD.admin ? 30 + S.speed * 0.25 : 30) * dt);
     else S.speed = Math.max(-9, S.speed - 7 * dt);
@@ -2162,7 +2238,7 @@ function stepGround(dt, inp){
   var yBall = S.pos.y + S.vy * dt - 0.5 * G * dt * dt;
   // launch only when the ground falls away faster than gravity could pull us down with it
   // (arcade: the sand only "holds" you with 0.6 G, so hill tops and steepening drop-offs throw you into the air)
-  var launch = (S.vy - vyG) > G * dt * 0.6 && aspd > 6;
+  var launch = (S.vy - vyG) > G * dt * 0.6 && aspd > 6 && !S.glued;      // drag racers are glued to the road
   if (launch && S.grace <= 0) {
     var sharp = (S.vy - vyG) > G * dt * 0.9;
     takeoff(); S.pos.y = Math.max(yBall, h + 0.01);
@@ -2177,6 +2253,7 @@ function stepGround(dt, inp){
   S.vy = vyG; S.pos.y = h;
   groundQuat(S.yaw, normalAt(S.pos.x, S.pos.z, n), -S.steerS * VD.lean * Math.min(1, aspd / 8), S.qT);
   S.q.slerp(S.qT, 1 - Math.exp(-14 * dt));
+  if (S.glued) return;
   if (inp.jump) { S.vy = Math.min(50, Math.max(S.vy, 0)) + VD.jump; takeoff(); sfx('jump'); }
   if (VD.thrust && inp.thrust && S.fuel > 0.02) { S.vy = Math.max(S.vy, 0) + 4; takeoff(); }
 }
@@ -2449,7 +2526,7 @@ function stepJet(dt, inp){
     S.pos.x += Math.sin(S.yaw) * S.speed * dt; S.pos.z += Math.cos(S.yaw) * S.speed * dt;
     S.horiz = S.speed;
     S.pos.y = heightAt(S.pos.x, S.pos.z) + VD.com;
-    var wantPitch = pitchIn < 0 && S.speed > 38 ? 0.16 : 0;
+    var wantPitch = (pitchIn !== 0 || inp.jump || S.speed > 70) && S.speed > 38 && !S.glued ? 0.16 : 0;   // ↓, ↑ or Space rotates, and it lifts off by itself when fast enough
     S.gpitch = (S.gpitch || 0) + (wantPitch - (S.gpitch || 0)) * (1 - Math.exp(-4 * dt));
     groundQuat(S.yaw, normalAt(S.pos.x, S.pos.z, _n2), 0, S.q);
     S.q.multiply(tmpQ.setFromAxisAngle(AX, -S.gpitch));
@@ -2509,7 +2586,7 @@ function stepRocket(dt, inp){
   S.engineOn = burning; S.roar = burning ? 0.38 : 0;
   if (S.grounded) {
     S.vx = S.vy = S.vz = 0;
-    if (thrust > G) { S.grounded = false; S.flightT = 0; toast('🚀 LIFTOFF!', '#ffffff'); missionEvent('liftoff', 1); S.pos.y += 0.2; }
+    if (thrust > G && !S.glued) { S.grounded = false; S.flightT = 0; toast('🚀 LIFTOFF!', '#ffffff'); missionEvent('liftoff', 1); S.pos.y += 0.2; }
     else return;
   }
   S.flightT = (S.flightT || 0) + dt;
@@ -2552,7 +2629,7 @@ function stepHeli(dt, inp){
     if (S.rotor > 0.2) S.yaw += S.steerS * 0.8 * dt;
     groundQuat(S.yaw, normalAt(S.pos.x, S.pos.z, _n2), 0, S.q);
     S.pos.y = heightAt(S.pos.x, S.pos.z) + VD.com;
-    if (inp.thr && S.rotor > 0.9) { S.grounded = false; S.flightT = 0; S.pos.y += 0.3; S.vy = 2; toast('🚁 LIFTOFF!', '#ffffff'); }
+    if (inp.thr && S.rotor > 0.9 && !S.glued) { S.grounded = false; S.flightT = 0; S.pos.y += 0.3; S.vy = 2; toast('🚁 LIFTOFF!', '#ffffff'); }
     return;
   }
   S.flightT = (S.flightT || 0) + dt;
@@ -3161,7 +3238,7 @@ function lmAt(i, j){
   }
   if (x != null) {
     var T = LM_TYPES[ty], p = pyrAt(Math.floor(x / PYR_CELL), Math.floor(z / PYR_CELL));
-    var clash = (p && Math.max(Math.abs(x - p.x), Math.abs(z - p.z)) < p.B + T.R + 30) || nearOasis(x, z, T.R + 20);
+    var clash = (p && Math.max(Math.abs(x - p.x), Math.abs(z - p.z)) < p.B + T.R + 30) || nearOasis(x, z, T.R + 20) || nearStrip(x, T.R + 60);
     if (!clash) {
       var r = T.R * 0.6, y = Math.min(baseHeight(x, z), baseHeight(x + r, z), baseHeight(x - r, z), baseHeight(x, z + r), baseHeight(x, z - r));
       L = { key: key, x: x, z: z, y: y, T: T, rot: hash(i - 2.2, j + 9.1) * TAU };
@@ -3332,7 +3409,7 @@ function updateDevils(dt, hs){
   devilT -= dt;
   if (devilT <= 0) {
     devilT = (curBiome === 3 ? 4 : 8) + Math.random() * 8;
-    if (hs < 220 && !hyperActive() && VD.flight !== 'rocket') spawnDevil(hs);
+    if (hs < 220 && !hyperActive() && VD.flight !== 'rocket' && !nearStrip(S.pos.x, 400)) spawnDevil(hs);
   }
   for (var i = 0; i < devils.length; i++) {
     var D = devils[i]; if (!D.on) continue;
@@ -3546,7 +3623,7 @@ function updateVariety(dt, hs){
 
 /* ================= multiplayer: one shared lobby + name tags ================= */
 var net = { ws: null, id: null, ok: false, tries: 0, sendT: 0, retryT: 0, players: new Map(), joinIdx: 0, status: 'connecting', listDirty: true };
-var NET_RATE = 0.125;            // 8 updates a second
+var NET_RATE = 1 / 12;           // 12 updates a second
 function netName(){
   var n = (prefs.name || '').replace(/[^\w \-\.]/g, '').trim().slice(0, 16);
   return n || 'Rider' + (prefs.tag || (prefs.tag = String(Math.floor(Math.random() * 9000) + 1000)));
@@ -3570,6 +3647,8 @@ function netRetry(){
 function netMessage(m){
   if (m.t === 'welcome') {
     net.id = m.id; net.status = 'online';
+    if (m.records) race.records = m.records;
+    if (m.race) raceMessage(m.race);
     (m.players || []).forEach(function(p){ netPlayer(p.id, p.name); });
     netStatus(); toast('🌐 JOINED THE LOBBY · ' + (m.players || []).length + ' other rider' + ((m.players || []).length === 1 ? '' : 's') + ' online', '#9fd8ff');
   } else if (m.t === 'join') {
@@ -3582,9 +3661,14 @@ function netMessage(m){
     var r = net.players.get(m.id) || netPlayer(m.id, m.n || 'Rider');
     var d = m.d, now = performance.now();
     for (var i = 0; i < 9; i++) if (typeof d[i] !== 'number' || !isFinite(d[i])) return;
-    r.snaps.push({ t: now, x: d[0], y: d[1], z: d[2], q: new THREE.Quaternion(d[3], d[4], d[5], d[6]).normalize(), v: VEH_ORDER[d[7]] || 'bike', kmh: d[8], sc: d[9] || 0 });
+    var vel = [+d[10] || 0, +d[11] || 0, +d[12] || 0];
+    r.snaps.push({ t: now, x: d[0], y: d[1], z: d[2], q: new THREE.Quaternion(d[3], d[4], d[5], d[6]).normalize(), v: VEH_ORDER[d[7]] || 'bike', kmh: d[8], sc: d[9] || 0, vel: vel });
     if (r.snaps.length > 6) r.snaps.shift();
     r.last = now;
+  } else if (m.t === 'ev') { netEvent(m);
+  } else if (m.t === 'hit') { takeHit(m);
+  } else if (m.t === 'race') { raceMessage(m);
+  } else if (m.t === 'raceResult') { raceResult(m);
   } else if (m.t === 'full') {
     net.status = 'full'; netStatus(); toast('🌐 The lobby is full right now', '#ff9a3c');
   }
@@ -3625,29 +3709,33 @@ function netRemove(id){
 }
 function netClearPlayers(){ Array.from(net.players.keys()).forEach(netRemove); }
 var _nq = new THREE.Quaternion();
-function netUpdateRemote(p, now){
+// remote riders are predicted forward from their last update using their velocity, then smoothly corrected,
+// so they look smooth with almost no delay
+function netUpdateRemote(p, now, dt){
   if (!p.snaps.length) return;
-  var rt = now - 160, a = null, b = null;               // draw everyone 160 ms in the past so movement stays smooth
-  for (var i = 0; i < p.snaps.length - 1; i++) if (p.snaps[i].t <= rt && p.snaps[i + 1].t >= rt) { a = p.snaps[i]; b = p.snaps[i + 1]; break; }
-  var x, y, z, s = p.snaps[p.snaps.length - 1];
-  if (a) {
-    var k = (rt - a.t) / Math.max(1, b.t - a.t);
-    x = a.x + (b.x - a.x) * k; y = a.y + (b.y - a.y) * k; z = a.z + (b.z - a.z) * k;
-    _nq.copy(a.q).slerp(b.q, k);
-  } else if (p.snaps.length >= 2 && rt > s.t) {        // running late: keep them moving for a moment
-    var pr = p.snaps[p.snaps.length - 2], dtm = Math.max(1, s.t - pr.t), ex = Math.min(400, rt - s.t) / dtm;
-    x = s.x + (s.x - pr.x) * ex; y = s.y + (s.y - pr.y) * ex; z = s.z + (s.z - pr.z) * ex; _nq.copy(s.q);
-  } else { x = p.snaps[0].x; y = p.snaps[0].y; z = p.snaps[0].z; _nq.copy(p.snaps[0].q); }
+  var s = p.snaps[p.snaps.length - 1], age = Math.min(0.6, (now - s.t) / 1000);
+  var v = s.vel || [0, 0, 0];
+  var px = s.x + v[0] * age, py = s.y + v[1] * age, pz = s.z + v[2] * age;
+  if (!p.rp) { p.rp = new V3(px, py, pz); p.rq = new THREE.Quaternion().copy(s.q); }
+  else {
+    p.rp.x += v[0] * dt; p.rp.y += v[1] * dt; p.rp.z += v[2] * dt;
+    var ex = px - p.rp.x, ey = py - p.rp.y, ez = pz - p.rp.z, err = Math.hypot(ex, ey, ez);
+    if (err > 60 + Math.hypot(v[0], v[1], v[2]) * 0.4) p.rp.set(px, py, pz);         // teleported: snap
+    else { var k = 1 - Math.exp(-10 * dt); p.rp.x += ex * k; p.rp.y += ey * k; p.rp.z += ez * k; }
+    p.rq.slerp(s.q, 1 - Math.exp(-14 * dt));
+  }
+  var x = p.rp.x, y = p.rp.y, z = p.rp.z;
   if (p.veh !== s.v) {                                   // they changed vehicle: copy that model
     if (p.model) p.root.remove(p.model);
     var D = VDEF[s.v]; p.model = D.obj.model.clone(true); p.model.visible = true; p.model.position.set(0, -D.com, 0); p.model.rotation.set(0, 0, 0);
     p.model.traverse(function(o){ o.castShadow = false; });
     p.root.add(p.model); p.veh = s.v; p.tagKey = '';
   }
-  p.root.position.set(x, y, z); p.root.quaternion.copy(_nq); p.root.visible = now - p.last < 5000;
-  p.x = x; p.z = z; p.kmh = s.kmh; p.sc = s.sc;
-  var key = p.name + '|' + p.veh;
-  if (p.tagKey !== key) { if (p.tag) scene.remove(p.tag); p.tag = makeTag(p.name, VDEF[p.veh].icon); scene.add(p.tag); p.tagKey = key; }
+  p.root.position.set(x, y, z); p.root.quaternion.copy(p.rq); p.root.visible = now - p.last < 5000;
+  p.x = x; p.z = z; p.kmh = s.kmh; p.sc = s.sc; p.vel = v;
+  if (p.hornT > 0) { p.hornT -= dt; if (p.hornT <= 0) p.tagKey = ''; }
+  var key = p.name + '|' + p.veh + '|' + (p.hornT > 0);
+  if (p.tagKey !== key) { if (p.tag) scene.remove(p.tag); p.tag = makeTag(p.name, (p.hornT > 0 ? '📣 ' : '') + VDEF[p.veh].icon); scene.add(p.tag); p.tagKey = key; }
   var dx = x - camera.position.x, dy = y - camera.position.y, dz = z - camera.position.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
   p.dist = Math.hypot(x - S.pos.x, z - S.pos.z);
   var sc = Math.max(1.3, Math.min(400, dist * 0.055));      // the tag stays readable however far away they are
@@ -3665,10 +3753,12 @@ function updateNet(dt){
       net.sendT = NET_RATE;
       var kmh = Math.round((S.grounded ? Math.abs(S.speed) : Math.hypot(S.vx, S.vy, S.vz)) * 3.6);
       var r2 = function(v){ return Math.round(v * 100) / 100; }, r3 = function(v){ return Math.round(v * 1000) / 1000; };
-      netSend({ t: 's', d: [r2(S.pos.x), r2(S.pos.y), r2(S.pos.z), r3(S.q.x), r3(S.q.y), r3(S.q.z), r3(S.q.w), VEH_ORDER.indexOf(cur), kmh, Math.round(S.score)] });
+      var gv = S.grounded && !VD.flight, svx = gv ? Math.sin(S.yaw) * S.horiz : S.vx, svz = gv ? Math.cos(S.yaw) * S.horiz : S.vz, svy = S.crashed ? 0 : S.vy;
+      if (hyper.phase === 2) { svx = S.vx; svz = S.vz; }
+      netSend({ t: 's', d: [r2(S.pos.x), r2(S.pos.y), r2(S.pos.z), r3(S.q.x), r3(S.q.y), r3(S.q.z), r3(S.q.w), VEH_ORDER.indexOf(cur), kmh, Math.round(S.score), r2(svx), r2(svy), r2(svz)] });
     }
   }
-  net.players.forEach(function(p){ netUpdateRemote(p, now); });
+  net.players.forEach(function(p){ netUpdateRemote(p, now, dt); });
   netListT -= dt;
   if (netListT <= 0 || net.listDirty) { netListT = 0.5; net.listDirty = false; drawNetList(); }
 }
@@ -3716,7 +3806,401 @@ $('nameIn').onchange = function(){
   prefs.name = this.value.replace(/[^\w \-\.]/g, '').trim().slice(0, 16); this.value = prefs.name; saveSettings();
   netSend({ t: 'name', name: netName() }); netStatus();
 };
+$('dragBtn').onclick = function(){ closeMenu(); if (!race.me) dragToggle(); };
 netConnect();
+
+/* ================= jump out of your vehicle (becomes the jetpack) ================= */
+var parked = null;
+function exitVehicle(){
+  if (race.me) { toast('Not during a drag race!', '#ff9a3c'); return; }
+  if (cur === 'jetpack') {
+    if (!parked) { toast('No vehicle to get back into', '#ff9a3c'); return; }
+    var d = Math.hypot(S.pos.x - parked.x, S.pos.z - parked.z), PD = VDEF[parked.key];
+    if (parked.falling) { toast('Wait for it to land!', '#ff9a3c'); return; }
+    if (d > 8 + PD.width * 3) { toast('Walk back to your ' + PD.name + ' (' + Math.round(d) + ' m away)', '#ff9a3c'); return; }
+    scene.remove(parked.g);
+    var k = parked.key;
+    S.pos.set(parked.x, parked.y, parked.z);
+    var f = new V3(0, 0, 1).applyQuaternion(parked.q); S.yaw = Math.atan2(f.x, f.z);
+    parked = null;
+    setVehicle(k, true);
+    respawn();
+    toast(VDEF[k].icon + ' BACK IN THE ' + VDEF[k].name.toUpperCase(), '#7dff6a'); sfx('click');
+    return;
+  }
+  if (S.crashed || hyperActive()) return;
+  if (parked) scene.remove(parked.g);
+  var D = VD, key = cur, g = new THREE.Group(), model = D.obj.model.clone(true);
+  model.visible = true; model.position.set(0, -D.com, 0); model.rotation.set(0, 0, 0);
+  g.add(model); g.position.copy(S.pos); g.quaternion.copy(S.q); scene.add(g);
+  var air = !S.grounded, vx = S.grounded ? Math.sin(S.yaw) * S.speed : S.vx, vy = S.grounded ? 0 : S.vy, vz = S.grounded ? Math.cos(S.yaw) * S.speed : S.vz;
+  parked = { key: key, g: g, x: S.pos.x, y: S.pos.y, z: S.pos.z, q: new THREE.Quaternion().copy(S.q), falling: air || Math.hypot(vx, vz) > 3, vx: vx, vy: vy, vz: vz, spin: air ? 0.8 : 0 };
+  var right = new V3(1, 0, 0).applyQuaternion(S.q); right.y = 0; if (right.lengthSq() < 0.01) right.set(1, 0, 0); right.normalize();
+  var off = D.width * 1.4 + 1.6;
+  if (key === 'rocket') { VDEF.rocket.obj.model.visible = false; RA = null; launchPad.visible = false; }
+  setVehicle('jetpack', true);
+  S.pos.x += right.x * off; S.pos.z += right.z * off;
+  if (air) {
+    S.grounded = false; S.vx = vx * 0.9; S.vz = vz * 0.9; S.vy = vy + 6; S.airT = 0; S.tricks = {}; S.trickPts = 0; S.angV.set(0, 0, 0);
+    toast('🪂 BAILED OUT!  Shift = jetpack · ' + keyName(binds.exitVeh) + ' to get back in', '#9fd8ff');
+  } else {
+    S.grounded = true; S.speed = 0; S.vx = S.vy = S.vz = 0; S.pos.y = heightAt(S.pos.x, S.pos.z) + VD.com;
+    groundQuat(S.yaw, normalAt(S.pos.x, S.pos.z, new V3()), 0, S.q);
+    toast('🚶 JUMPED OUT · walk back and press ' + keyName(binds.exitVeh) + ' to get in', '#9fd8ff');
+  }
+  sfx('click');
+}
+function updateParked(dt){
+  var P = parked; if (!P || !P.falling) return;
+  P.vy -= G * dt; P.x += P.vx * dt; P.y += P.vy * dt; P.z += P.vz * dt;
+  if (P.spin) P.q.multiply(tmpQ.setFromAxisAngle(AX, P.spin * dt));
+  var h = heightAt(P.x, P.z) + VDEF[P.key].com;
+  if (P.y <= h) {
+    var hard = Math.hypot(P.vx, P.vy, P.vz) > 18;
+    P.y = h; P.falling = false;
+    groundQuat(Math.atan2(P.vx, P.vz) || 0, normalAt(P.x, P.z, new V3()), hard ? 0.5 : 0, P.q);
+    if (hard) { boomAt(P.x, P.y, P.z, 1); toast('💥 YOUR ' + VDEF[P.key].name.toUpperCase() + ' CRASHED!', '#ff8a2a'); }
+  }
+  P.g.position.set(P.x, P.y, P.z); P.g.quaternion.copy(P.q);
+}
+
+/* ================= missiles, explosions & ramming other players ================= */
+var missiles = [], missileCool = 0, ramCool = 0, hornCool = 0;
+var missileGeo = new THREE.CylinderGeometry(0.16, 0.2, 1.7, 10).rotateX(Math.PI / 2), missileMat = std(0xe8e8e8, 0.4, 0.5);
+var missileGlow = glow(0xff7a22, 2.2), missileGlowGeo = new THREE.SphereGeometry(0.26, 8, 6);
+function makeMissileMesh(){
+  var g = new THREE.Group();
+  g.add(new THREE.Mesh(missileGeo, missileMat));
+  var t = new THREE.Mesh(missileGlowGeo, missileGlow); t.position.z = -0.95; g.add(t);
+  scene.add(g); return g;
+}
+function boomAt(x, y, z, power){
+  var d = Math.hypot(x - S.pos.x, y - S.pos.y, z - S.pos.z);
+  for (var i = 0; i < 60 * power; i++) spawnP(bigFire, x, y, z, 0, 4, 0, 20 * power, 1.0);
+  for (var j = 0; j < 30 * power; j++) spawnP(smoke, x, y, z, 0, 3, 0, 10 * power, 3);
+  if (d < 120) shakeT = Math.max(shakeT, 0.6 * (1 - d / 120));
+  if (d < 600) sfx('boom');
+}
+function fireMissile(){
+  if (missileCool > 0 || S.crashed) return;
+  missileCool = 0.45;
+  var f = new V3(0, 0, 1).applyQuaternion(S.q).normalize();
+  if (S.grounded && !VD.flight) f.set(Math.sin(S.yaw), 0.04, Math.cos(S.yaw)).normalize();
+  var vx = S.grounded ? Math.sin(S.yaw) * S.speed : S.vx, vy = S.grounded ? 0 : S.vy, vz = S.grounded ? Math.cos(S.yaw) * S.speed : S.vz;
+  var sp = 260, len = Math.max(3, (VD.camDist || 10) * 0.25);
+  var M = { g: makeMissileMesh(), x: S.pos.x + f.x * len, y: S.pos.y + 1.2 + f.y * len, z: S.pos.z + f.z * len,
+            vx: vx + f.x * sp, vy: vy + f.y * sp + 3, vz: vz + f.z * sp, life: 5, mine: true };
+  missiles.push(M);
+  netSend({ t: 'ev', e: { k: 'm', x: M.x, y: M.y, z: M.z, vx: M.vx, vy: M.vy, vz: M.vz } });
+  sfx('missile');
+}
+function updateMissiles(dt){
+  if (missileCool > 0) missileCool -= dt;
+  for (var i = missiles.length - 1; i >= 0; i--) {
+    var M = missiles[i];
+    M.life -= dt;
+    if (M.mine) {                                   // gently homes in on the nearest rider in front of it
+      var sp = Math.hypot(M.vx, M.vy, M.vz), best = null, bd = 450;
+      net.players.forEach(function(p){
+        if (!p.root.visible) return;
+        var dx = p.root.position.x - M.x, dy = p.root.position.y - M.y, dz = p.root.position.z - M.z, d = Math.hypot(dx, dy, dz);
+        if (d < bd && (dx * M.vx + dy * M.vy + dz * M.vz) / (d * sp + 1e-6) > 0.45) { bd = d; best = p; }
+      });
+      M.lock = best; M.lockD = bd;
+      if (best) {
+        var tx = best.root.position.x - M.x, ty = best.root.position.y + 1 - M.y, tz = best.root.position.z - M.z, td = Math.hypot(tx, ty, tz) || 1;
+        var k = Math.min(1, dt * (6 + 500 / Math.max(10, bd)));      // turns harder the closer it gets
+        M.vx += (tx / td * sp - M.vx) * k; M.vy += (ty / td * sp - M.vy) * k; M.vz += (tz / td * sp - M.vz) * k;
+      }
+      if (!best || bd > 25) {                         // skim over the dunes instead of nosing into them
+        var gA = Math.max(heightAt(M.x + M.vx * 0.08, M.z + M.vz * 0.08), heightAt(M.x + M.vx * 0.18, M.z + M.vz * 0.18), heightAt(M.x + M.vx * 0.32, M.z + M.vz * 0.32));
+        if (M.y < gA + 4) M.vy = Math.max(M.vy, (gA + 4 - M.y) * 12);
+      }
+    }
+    var n = Math.max(1, Math.ceil(Math.hypot(M.vx, M.vy, M.vz) * dt / 4)), sdt = dt / n, hit = null, ground = false;
+    for (var s = 0; s < n && !hit && !ground; s++) {
+      M.x += M.vx * sdt; M.y += M.vy * sdt; M.z += M.vz * sdt;
+      if (M.y < heightAt(M.x, M.z) + 0.3 && !(M.lock && M.lockD < 70)) ground = true;   // locked on and close: it skims through the dune crest
+      if (M.mine) net.players.forEach(function(p){
+        if (hit || !p.root.visible) return;
+        var r = 9 + (VDEF[p.veh] ? VDEF[p.veh].width * 2 : 2);       // proximity fuse
+        if (Math.hypot(p.root.position.x - M.x, p.root.position.y - M.y, p.root.position.z - M.z) < r) hit = p;
+      });
+    }
+    M.g.position.set(M.x, M.y, M.z);
+    M.g.lookAt(M.x + M.vx, M.y + M.vy, M.z + M.vz);
+    spawnP(smoke, M.x, M.y, M.z, 0, 0.5, 0, 0.4, 1.0);
+    if (hit || ground || M.life <= 0) {
+      if (M.mine || ground) boomAt(M.x, M.y, M.z, 0.8);
+      if (M.mine && (hit || ground)) netSend({ t: 'ev', e: { k: 'x', x: M.x, y: M.y, z: M.z } });
+      if (hit) {
+        var d = Math.hypot(M.vx, M.vz) || 1;
+        netSend({ t: 'hit', to: hit.id, k: 'missile', vx: M.vx / d * 22, vy: 32, vz: M.vz / d * 22 });
+        var pts = Math.round(5000 * VD.pts); S.score += pts;
+        toast('💥 BLEW UP ' + hit.name.toUpperCase() + '!  +' + fmt(pts), '#ff8a2a'); missionEvent('blowup', 1);
+      }
+      scene.remove(M.g); missiles.splice(i, 1);
+    }
+  }
+}
+function takeHit(m){
+  if (hyperActive() || S.crashed) return;
+  var who = String(m.n || 'someone').toUpperCase().slice(0, 16);
+  boomAt(S.pos.x, S.pos.y, S.pos.z, m.k === 'ram' ? 0.6 : 1.2);
+  var cl = function(v){ return Math.max(-150, Math.min(150, +v || 0)); };
+  if (!VD.flight && !S.glued) {
+    if (S.grounded) { takeoff(); S.pos.y += 0.5; }
+    S.vx += cl(m.vx); S.vz += cl(m.vz); S.vy = Math.max(S.vy, 0) + Math.min(45, Math.abs(cl(m.vy)));
+  }
+  if (!noCrash()) crash(m.k === 'ram' ? 'RAMMED BY ' + who + '!' : 'BLOWN UP BY ' + who + '!');
+  else toast(m.k === 'ram' ? '💥 ' + who + ' RAMMED YOU!' : '💥 ' + who + ' BLEW YOU UP!', '#ff8a2a');
+}
+function checkRams(dt){
+  if (ramCool > 0) { ramCool -= dt; return; }
+  if (S.crashed || hyperActive()) return;
+  var mvx = S.grounded ? Math.sin(S.yaw) * S.speed : S.vx, mvy = S.grounded ? 0 : S.vy, mvz = S.grounded ? Math.cos(S.yaw) * S.speed : S.vz;
+  var mySp = Math.hypot(mvx, mvy, mvz);
+  net.players.forEach(function(p){
+    if (ramCool > 0 || !p.root.visible || !p.vel) return;
+    var PD = VDEF[p.veh] || VD, r = (VD.width + PD.width) * 0.9 + 1.4;
+    var dx = p.root.position.x - S.pos.x, dy = p.root.position.y - S.pos.y, dz = p.root.position.z - S.pos.z, d = Math.hypot(dx, dy, dz);
+    if (d > r || d < 0.01) return;
+    var theirSp = Math.hypot(p.vel[0], p.vel[1], p.vel[2]), rel = Math.hypot(mvx - p.vel[0], mvy - p.vel[1], mvz - p.vel[2]);
+    // push apart so you can't drive through each other
+    var push = (r - d) / d; S.pos.x -= dx * push * 0.5; S.pos.z -= dz * push * 0.5;
+    if (mySp > theirSp + 3 && rel > 12) {           // the faster one does the smashing
+      ramCool = 1.2;
+      var k = 0.6 + Math.min(0.8, rel / 120);
+      netSend({ t: 'hit', to: p.id, k: 'ram', vx: mvx * k, vy: 10 + rel * 0.2, vz: mvz * k });
+      var pts = Math.round(3000 * VD.pts); S.score += pts;
+      boomAt((S.pos.x + p.root.position.x) / 2, S.pos.y, (S.pos.z + p.root.position.z) / 2, 0.5);
+      toast('💥 SMASHED ' + p.name.toUpperCase() + '!  +' + fmt(pts), '#ff8a2a'); missionEvent('blowup', 1);
+      if (S.grounded) S.speed *= 0.7; else { S.vx *= 0.7; S.vz *= 0.7; }
+    }
+  });
+}
+function honk(){
+  if (hornCool > 0) return; hornCool = 0.8;
+  sfx('horn'); netSend({ t: 'ev', e: { k: 'h' } });
+}
+function netEvent(m){
+  var e = m.e || {}, p = net.players.get(m.id);
+  if (e.k === 'm') {
+    var M = { g: makeMissileMesh(), x: +e.x || 0, y: +e.y || 0, z: +e.z || 0, vx: +e.vx || 0, vy: +e.vy || 0, vz: +e.vz || 0, life: 5, mine: false };
+    missiles.push(M);
+    if (Math.hypot(M.x - S.pos.x, M.z - S.pos.z) < 500) sfx('missile');
+  } else if (e.k === 'x') {
+    boomAt(+e.x || 0, +e.y || 0, +e.z || 0, 0.8);
+    for (var i = missiles.length - 1; i >= 0; i--) if (!missiles[i].mine && Math.hypot(missiles[i].x - e.x, missiles[i].y - e.y, missiles[i].z - e.z) < 60) { scene.remove(missiles[i].g); missiles.splice(i, 1); break; }
+  } else if (e.k === 'h' && p) {
+    p.hornT = 1.5; p.tagKey = '';
+    if (p.dist < 800) sfx('horn');
+  }
+}
+
+/* ================= the drag strip: one infinitely long straight, F1 lights, 1-minute races ================= */
+var race = { phase: 'idle', me: false, lane: 3, lobbyEnd: 0, lightsAt: 0, goAt: 0, endAt: 0, players: [], sent: false, react: null, records: [], invited: false, local: null, lastLight: -1, resultsT: 0 };
+var RACE_LEN = 60000;
+function laneX(l){ return STRIP_X + (l - 3.5) * LANE_W; }
+var stripG = new THREE.Group(); scene.add(stripG); stripG.visible = false;
+var stripTex = (function(){
+  var c = canvas(256, 512), x = c.getContext('2d');
+  x.fillStyle = '#2a2a2d'; x.fillRect(0, 0, 256, 512);
+  for (var i = 0; i < 1600; i++) { var g = 30 + Math.floor(Math.random() * 40); x.fillStyle = 'rgb(' + g + ',' + g + ',' + (g + 3) + ')'; x.fillRect(Math.random() * 256, Math.random() * 512, 2, 2); }
+  for (var k = 1; k < 8; k++) { x.fillStyle = 'rgba(255,255,255,0.85)'; x.fillRect(k * 32 - 1, 0, 2, 300); }
+  x.fillStyle = '#ffd21a'; x.fillRect(0, 0, 4, 512); x.fillRect(252, 0, 4, 512);
+  var t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1, 150); return t;
+})();
+var STRIP_LEN = 3000;
+var stripRoad = new THREE.Mesh(new THREE.PlaneGeometry(LANE_W * 8, STRIP_LEN).rotateX(-Math.PI / 2),
+  new THREE.MeshLambertMaterial({ map: stripTex, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+stripRoad.receiveShadow = true; stripG.add(stripRoad);
+var wallMat = std(0xd8d8d8, 0.8), wallRed = std(0xd8262e, 0.6);
+var walls = [-1, 1].map(function(s){
+  var w = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.0, STRIP_LEN), s < 0 ? wallMat : wallRed);
+  w.position.x = s * (LANE_W * 4 + 0.6); w.castShadow = true; w.receiveShadow = true; stripG.add(w); return w;
+});
+// start line, F1 light gantry & banner sit at z = 0
+var startG = new THREE.Group(); startG.position.set(STRIP_X, STRIP_H, 0); scene.add(startG); startG.visible = false;
+(function(){
+  var c = canvas(256, 32), x = c.getContext('2d');
+  for (var i = 0; i < 32; i++) for (var j = 0; j < 4; j++) { x.fillStyle = (i + j) % 2 ? '#111' : '#fff'; x.fillRect(i * 8, j * 8, 8, 8); }
+  var line = new THREE.Mesh(new THREE.PlaneGeometry(LANE_W * 8, 2.4).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(c), polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }));
+  line.position.y = 0.04; startG.add(line);
+  var pole = std(0x2b2d31, 0.5, 0.6);
+  box(0.6, 10, 0.6, pole, startG, -LANE_W * 4 - 1.2, 5, 6); box(0.6, 10, 0.6, pole, startG, LANE_W * 4 + 1.2, 5, 6);
+  box(LANE_W * 8 + 3, 1.6, 0.7, pole, startG, 0, 9.6, 6);
+  var bc = canvas(512, 64), bx = bc.getContext('2d');
+  bx.fillStyle = '#d8262e'; bx.fillRect(0, 0, 512, 64); bx.fillStyle = '#fff'; bx.font = 'bold 44px system-ui, sans-serif'; bx.textAlign = 'center'; bx.textBaseline = 'middle'; bx.fillText('🏁 DUNE RIDER DRAG STRIP 🏁', 256, 34);
+  var banner = new THREE.Mesh(new THREE.PlaneGeometry(22, 2.75), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(bc) }));
+  banner.position.set(0, 12, 6); banner.rotation.y = Math.PI; startG.add(banner);
+})();
+var f1Mats = [], f1Off = new THREE.Color(0x3a0606), f1On = new THREE.Color(0xff2020);
+(function(){
+  var lampGeo = new THREE.SphereGeometry(0.42, 14, 10);
+  for (var k = 0; k < 5; k++) {
+    var mat = new THREE.MeshBasicMaterial({ color: 0x3a0606 }); f1Mats.push(mat);
+    var pod = box(1.4, 2.4, 0.6, std(0x111111, 0.6), startG, (k - 2) * 2.4, 11.8, 5.6);
+    [0.55, -0.55].forEach(function(dy){ var l = new THREE.Mesh(lampGeo, mat); l.position.set((k - 2) * 2.4, 11.8 + dy, 5.25); startG.add(l); });
+  }
+})();
+function setF1(n){ for (var k = 0; k < 5; k++) f1Mats[k].color.copy(k < n ? f1On : f1Off); }
+// distance boards every 500 m
+var boards = [];
+for (var bi = 0; bi < 8; bi++) {
+  var bcv = canvas(256, 128), bsp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(bcv), fog: false }));
+  bsp.scale.set(10, 5, 1); bsp.visible = false; scene.add(bsp); boards.push({ s: bsp, c: bcv, k: null });
+}
+function drawBoard(b, k){
+  var c = b.c, x = c.getContext('2d');
+  x.fillStyle = '#111'; x.fillRect(0, 0, 256, 128); x.strokeStyle = '#ffd21a'; x.lineWidth = 8; x.strokeRect(4, 4, 248, 120);
+  x.fillStyle = '#fff'; x.font = 'bold 64px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(k % 2 ? (k * 0.5).toFixed(1) + ' km' : (k / 2) + ' km', 128, 66);
+  b.s.material.map.needsUpdate = true; b.k = k;
+}
+function updateStripVisuals(){
+  var near = Math.abs(S.pos.x - STRIP_X) < 3500;
+  stripG.visible = near; startG.visible = near && Math.abs(S.pos.z) < 6000;
+  if (!near) { boards.forEach(function(b){ b.s.visible = false; }); return; }
+  var zc = Math.round(S.pos.z / 20) * 20;
+  stripG.position.set(STRIP_X, STRIP_H + 0.03, zc);
+  var k0 = Math.max(1, Math.floor(S.pos.z / 500));
+  for (var i = 0; i < boards.length; i++) {
+    var b = boards[i], k = k0 + i - 1;
+    if (k < 1) { b.s.visible = false; continue; }
+    if (b.k !== k) drawBoard(b, k);
+    b.s.position.set(STRIP_X + (i % 2 ? 1 : -1) * (LANE_W * 4 + 6), STRIP_H + 4, k * 500); b.s.visible = true;
+  }
+}
+
+// race HUD
+function raceHud(html, show){ var e = $('raceHud'); if (show === false) { e.style.display = 'none'; return; } e.style.display = 'block'; if (e.innerHTML !== html) e.innerHTML = html; }
+function f1Hud(n, show){
+  var e = $('f1'); if (!show) { e.style.display = 'none'; return; }
+  e.style.display = 'flex';
+  var h = ''; for (var k = 0; k < 5; k++) h += '<i class="' + (k < n ? 'on' : '') + '"></i>';
+  if (e.innerHTML !== h) e.innerHTML = h;
+}
+function fmtDist(m){ return m >= 1000 ? (m / 1000).toFixed(m >= 100000 ? 0 : 2) + ' km' : Math.round(m) + ' m'; }
+function goToGrid(lane){
+  if (hyperActive()) cancelHyper();
+  if (VD.flight === 'rocket') setVehicle('drag');
+  S.crashed = false; S.grounded = true; S.speed = 0; S.horiz = 0; S.vx = S.vy = S.vz = 0; S.angV.set(0, 0, 0); S.yaw = 0; S.flightT = 0; S.sink = 0; S.rotor = 0;
+  S.pos.set(laneX(lane), STRIP_H + VD.com, -5);
+  groundQuat(0, AY, 0, S.q);
+  rebuildTerrain(S.pos.x, S.pos.z + 200);
+}
+function dragToggle(){
+  if (race.me) {                                  // leave the race
+    race.me = false; S.glued = false; netSend({ t: 'dragLeave' });
+    if (race.local) race.local = null;
+    raceHud('', false); f1Hud(0, false); toast('🏁 Left the drag race', '#ff9a3c'); return;
+  }
+  if (parked) { scene.remove(parked.g); parked = null; }
+  goToGrid(3);
+  if (net.status === 'online') { netSend({ t: 'dragJoin', veh: cur }); toast('🏁 DRAG STRIP · joining the next race…', '#ffe14d'); }
+  else { race.local = { t: performance.now() }; raceMessage({ t: 'race', phase: 'lobby', in: 4000, players: [{ id: 'me', name: netName(), lane: 3 }] }); }
+}
+function raceMessage(m){
+  var now = performance.now(), myId = net.id || 'me';
+  var mine = (m.players || []).filter(function(p){ return p.id === myId; })[0];
+  if (m.phase === 'idle') { if (race.me && race.phase === 'lobby') { race.phase = 'idle'; race.me = false; S.glued = false; raceHud('', false); } return; }
+  if (m.phase === 'wait') { race.me = true; race.phase = 'wait'; raceHud('🏁 Race in progress · you\'re in the next one (' + Math.ceil(m.in / 1000) + ' s)', true); return; }
+  race.players = m.players || [];
+  if (m.phase === 'lobby') {
+    if (!mine) {
+      if (!race.invited && !race.me) { race.invited = true; toast('🏁 A DRAG RACE STARTS IN ' + Math.ceil(m.in / 1000) + ' s · press ' + keyName(binds.dragStrip) + ' to join!', '#ffe14d'); }
+      return;
+    }
+    if (race.phase !== 'lobby' || race.lane !== mine.lane) { race.lane = mine.lane; goToGrid(mine.lane); }
+    race.me = true; race.phase = 'lobby'; race.lobbyEnd = now + m.in; S.glued = true; race.sent = false; race.react = null;
+  } else if (m.phase === 'lights') {
+    race.invited = false;
+    if (!mine) return;
+    if (!race.me || race.phase !== 'lights') { race.lane = mine.lane; goToGrid(mine.lane); }
+    race.me = true; race.phase = 'lights'; race.lightsAt = now; race.goAt = now + m.goIn; race.endAt = race.goAt + RACE_LEN; S.glued = true; race.lastLight = -1;
+  }
+}
+function raceResult(m){
+  race.records = m.records || race.records;
+  var rows = m.rows || [];
+  var wasIn = race.me && (race.phase === 'done' || race.phase === 'racing');
+  if (wasIn || rows.some(function(r){ return r.id === (net.id || 'me'); })) {
+    race.me = false; race.phase = 'idle'; S.glued = false;
+    var medals = ['🥇', '🥈', '🥉'];
+    var h = '<div class="rt">🏁 RACE RESULTS</div>';
+    rows.forEach(function(r, i){
+      h += '<div class="rr' + (r.id === (net.id || 'me') ? ' me' : '') + '"><span>' + (medals[i] || (i + 1) + '.') + ' ' + (VDEF[r.veh] ? VDEF[r.veh].icon + ' ' : '') + String(r.name).replace(/</g, '') + '</span><b>' + (r.dist > 0 ? fmtDist(r.dist) : 'DNF') + '</b></div>';
+    });
+    if (race.records.length) {
+      var top = race.records[0];
+      h += '<div class="rt2">🏆 ALL-TIME RECORD</div><div class="rr rec"><span>' + (VDEF[top.veh] ? VDEF[top.veh].icon + ' ' : '') + String(top.name).replace(/</g, '') + '</span><b>' + fmtDist(top.dist) + '</b></div>';
+      race.records.slice(1, 5).forEach(function(r, i){ h += '<div class="rr small"><span>' + (i + 2) + '. ' + String(r.name).replace(/</g, '') + '</span><b>' + fmtDist(r.dist) + '</b></div>'; });
+    }
+    if (m.newRecord) h += '<div class="rt2" style="color:#ffe14d">⭐ NEW ALL-TIME RECORD! ⭐</div>';
+    var e = $('raceRes'); e.innerHTML = h + '<div class="tip">' + keyName(binds.dragStrip) + ' = race again</div>'; e.style.display = 'block'; race.resultsT = 14;
+    raceHud('', false); f1Hud(0, false);
+    if (rows[0] && rows[0].id === (net.id || 'me') && rows[0].dist > 0) { popup('🏆 YOU WON!', fmtDist(rows[0].dist) + ' in one minute', ''); sfx('level'); missionEvent('dragwin', 1); }
+  }
+}
+function localRaceTick(now){
+  var L = race.local; if (!L) return;
+  if (race.phase === 'lobby' && now >= race.lobbyEnd) raceMessage({ t: 'race', phase: 'lights', goIn: 5500 + Math.random() * 2000, players: [{ id: 'me', name: netName(), lane: 3 }] });
+  if (race.phase === 'done' && now >= race.endAt + 600) {
+    var rec = load('duneRider.dragRecords', []), d = race.myDist, isNew = !rec.length || d > rec[0].dist;
+    rec.push({ name: netName(), dist: d, veh: cur }); rec.sort(function(a, b){ return b.dist - a.dist; }); rec = rec.slice(0, 10); save('duneRider.dragRecords', rec);
+    race.local = null;
+    raceResult({ rows: [{ id: 'me', name: netName(), dist: d, veh: cur }], records: rec, newRecord: isNew && d > 0 });
+  }
+}
+function updateRace(dt){
+  var now = performance.now();
+  updateStripVisuals();
+  if (race.resultsT > 0) { race.resultsT -= dt; if (race.resultsT <= 0) $('raceRes').style.display = 'none'; }
+  localRaceTick(now);
+  if (race.me && race.phase === 'done' && now > race.endAt + 12000) { race.me = false; race.phase = 'idle'; raceHud('', false); toast('🏁 No results came back from the lobby', '#ff9a3c'); }
+  if (!race.me) { if (race.phase !== 'idle') race.phase = 'idle'; S.glued = false; return; }
+  var frozen = race.phase === 'lobby' || (race.phase === 'lights' && now < race.goAt);
+  if (frozen) {                                    // held on the grid
+    S.pos.set(laneX(race.lane), STRIP_H + VD.com, -5); S.speed = 0; S.horiz = 0; S.vx = S.vy = S.vz = 0; S.grounded = true; S.yaw = 0; S.crashed = false;
+    groundQuat(0, AY, 0, S.q);
+    if (race.phase === 'lights' && act('throttle') && race.react === null) race.react = -1;   // jumped the start (ignored, but noted)
+  }
+  if (race.phase === 'lobby') {
+    var others = race.players.length - 1;
+    raceHud('🏁 DRAG RACE · lane ' + (race.lane + 1) + '<small>starts in ' + Math.max(0, Math.ceil((race.lobbyEnd - now) / 1000)) + ' s · ' + (others > 0 ? others + ' other racer' + (others > 1 ? 's' : '') : 'waiting for others to join') + ' · glued to the ground for 1 minute</small>', true);
+    f1Hud(0, true); setF1(0);
+  } else if (race.phase === 'lights') {
+    if (now < race.goAt) {
+      var lit = Math.min(5, Math.floor((now - race.lightsAt) / 1000) + 1);
+      if (lit !== race.lastLight) { race.lastLight = lit; sfx('light'); }
+      setF1(lit); f1Hud(lit, true); raceHud('🏁 GET READY…<small>go when the lights go OUT</small>', true);
+    } else {
+      race.phase = 'racing'; setF1(0); f1Hud(0, false); sfx('go'); popup('GO GO GO!', '', '');
+      race.react = null; race.startedAt = now;
+    }
+  } else if (race.phase === 'racing') {
+    if (race.react === null && act('throttle')) race.react = (now - race.goAt) / 1000;
+    if (Math.abs(S.pos.x - STRIP_X) > LANE_W * 4 - 1) { S.pos.x = STRIP_X + Math.sign(S.pos.x - STRIP_X) * (LANE_W * 4 - 1); S.steerS = 0; }
+    var dist = Math.max(0, S.pos.z), left = Math.max(0, race.endAt - now), myId = net.id || 'me', pos = 1, n = 1;
+    race.players.forEach(function(p){ if (p.id === myId) return; var r = net.players.get(p.id); if (!r) return; n++; if (r.z > S.pos.z) pos++; });
+    raceHud('<span class="big">' + fmtDist(dist) + '</span><small>' + (n > 1 ? 'P' + pos + ' of ' + n + ' · ' : '') + Math.ceil(left / 1000) + ' s left' + (race.react != null && race.react >= 0 ? ' · reaction ' + race.react.toFixed(3) + ' s' : '') + '</small>', true);
+    if (now >= race.endAt) {
+      race.phase = 'done'; race.myDist = dist; S.glued = false;
+      netSend({ t: 'dragResult', dist: dist, veh: cur });
+      popup('🏁 FINISH!', fmtDist(dist) + ' in one minute', ''); sfx('mission');
+      raceHud('🏁 ' + fmtDist(dist) + '<small>waiting for the results…</small>', true);
+    }
+  }
+}
+
+function updatePlay(dt){
+  if (hornCool > 0) hornCool -= dt;
+  updateParked(dt);
+  updateMissiles(dt);
+  if (net.status === 'online') checkRams(dt);
+  updateRace(dt);
+}
 
 /* ================= missions & XP ================= */
 var MISSIONS = [
@@ -3756,7 +4240,9 @@ var MISSIONS = [
   { id: 'arch3', text: 'Thread 3 stone arches', need: 3, ev: 'arch', xp: 500 },
   { id: 'overclock', text: 'Overclock a vehicle (O)', need: 1, ev: 'overclock', xp: 200 },
   { id: 'speed20k', text: 'Reach 20,000 km/h', need: 1, ev: 'speed', min: 20000, xp: 500 },
-  { id: 'sr71', text: 'Fly the SR-71 at 100,000 km/h', need: 1, ev: 'speed', min: 100000, xp: 600 },
+  { id: 'blowup', text: 'Blow up or smash another player (M = missile)', need: 1, ev: 'blowup', xp: 300 },
+  { id: 'dragwin', text: 'Win a drag race (Y = drag strip)', need: 1, ev: 'dragwin', xp: 500 },
+  { id: 'sr71', text: 'Fly the SR-71 at 1,000,000 km/h', need: 1, ev: 'speed', min: 1000000, xp: 600 },
   { id: 'boosterland', text: 'Land the Moon Rocket on the pad (press Q in flight)', need: 1, ev: 'boosterland', xp: 600 },
   { id: 'bullseye', text: 'Land the rocket within 1.5 m of the pad centre', need: 1, ev: 'bullseye', xp: 800 },
   { id: 'helitouch', text: 'Fly the helicopter and land it again', need: 1, ev: 'helitouch', xp: 300 },
@@ -3832,7 +4318,7 @@ function setVehicle(key, keepState){
   vehChip.innerHTML = VD.icon + ' ' + VD.name.toUpperCase() + '<small>' + keyName(binds.vehicle) + ' to change vehicle · ' + keyName(binds.camera) + ' camera · ' + keyName(binds.overclock) + ' overclock' +
     (VD.flight === 'heli' ? '<br>arrows rotate · ' + keyName(binds.jump) + ' level out' : '') +
     (VD.flight === 'rocket' ? '<br>' + keyName(binds.spinL) + ' booster landing · ' + keyName(binds.jump) + ' eject' : '') +
-    (VD.admin ? '<br>' + keyName(binds.wings) + ' wings · ' + keyName(binds.thrust) + ' hyperspace' : '') + '</small>';
+    (VD.admin ? '<br>' + keyName(binds.wings) + ' wings · ' + keyName(binds.thrust) + ' hyperspace' : VD.hyper ? '<br>' + keyName(binds.thrust) + ' hyperspace' : '') + '</small>';
   document.getElementById('fuel').style.display = VD.thrust ? 'block' : 'none';
   renderVehicles(); renderPaints();
 }
@@ -3936,7 +4422,7 @@ function updateHUD(){
     if (fuelLbl.textContent !== fl) fuelLbl.textContent = fl;
   }
   var altNow = S.pos.y - VD.com - heightAt(S.pos.x, S.pos.z);
-  if (VD.flight || altNow > 60) { altEl.style.display = 'block'; altEl.textContent = 'ALT ' + fmt(Math.max(0, altNow)) + ' m' + (VD.flight === 'rocket' && !S.grounded ? (RA ? '  ·  AUTOPILOT: ' + RA.phase.toUpperCase() : '  ·  ' + keyName(binds.spinL) + ' = BOOSTER LANDING' + (S.payload ? '  ·  ' + keyName(binds.jump) + ' = EJECT' : '')) : '') + (VD.flight === 'jet' && S.grounded ? '  ·  hold W, then ↓ to take off' : '') + (VD.flight === 'heli' ? (S.grounded ? '  ·  hold W to spin up & lift off' : '  ·  ' + keyName(binds.jump) + ' = LEVEL OUT') : ''); }
+  if (VD.flight || altNow > 60) { altEl.style.display = 'block'; altEl.textContent = 'ALT ' + fmt(Math.max(0, altNow)) + ' m' + (VD.flight === 'rocket' && !S.grounded ? (RA ? '  ·  AUTOPILOT: ' + RA.phase.toUpperCase() : '  ·  ' + keyName(binds.spinL) + ' = BOOSTER LANDING' + (S.payload ? '  ·  ' + keyName(binds.jump) + ' = EJECT' : '')) : '') + (VD.flight === 'jet' && S.grounded ? '  ·  hold W to take off' : '') + (VD.flight === 'heli' ? (S.grounded ? '  ·  hold W to spin up & lift off' : '  ·  ' + keyName(binds.jump) + ' = LEVEL OUT') : ''); }
   else altEl.style.display = 'none';
   boostFill.style.width = (S.boost * 100).toFixed(1) + '%';
   var ocOn = S.overclock;
@@ -4148,6 +4634,10 @@ function sfx(type){
   else if (type === 'wings') { noise(0.07, 3500, 0.3); tone(320, 200, 0.1, 'square', 0.04); noise(0.07, 2500, 0.25); }
   else if (type === 'clean') { tone(400, 1200, 0.35, 'sine', 0.12); noise(0.4, 2500, 0.15); }
   else if (type === 'flap') { noise(0.28, 650, 0.3); tone(170, 110, 0.22, 'sine', 0.06); }
+  else if (type === 'horn') { tone(392, 392, 0.45, 'square', 0.07); tone(494, 494, 0.45, 'square', 0.05); }
+  else if (type === 'missile') { noise(0.6, 3000, 0.25); tone(900, 300, 0.5, 'sawtooth', 0.04); }
+  else if (type === 'light') tone(880, 880, 0.18, 'sine', 0.14);
+  else if (type === 'go') { tone(1320, 1320, 0.5, 'sine', 0.16); tone(660, 660, 0.5, 'square', 0.04); }
   else if (type === 'boom') { noise(0.12, 7000, 0.6); noise(1.6, 240, 1.0); tone(75, 26, 1.4, 'sine', 0.7); tone(48, 20, 1.8, 'triangle', 0.4, 0.05); }
 }
 
@@ -4155,12 +4645,13 @@ function sfx(type){
 var CAM_NAMES = ['CHASE CAM', 'CLOSE CAM', 'HELMET CAM', 'CINEMATIC CAM'];
 var camYaw = 0, camY = S.pos.y + 3, camMode = 0, lastFov = 70, cine = null;
 var FLIPY = new THREE.Quaternion().setFromAxisAngle(AY, Math.PI), _cp = new V3();
-var _co = new V3(), _cl = new V3(), _cu = new V3(), flightCamInit = false;
+var _co = new V3(), _cl = new V3(), _cu = new V3(), flightCamInit = false, flightCamPrev = new V3();
 function flightCamera(dt, hs){
   var close = camMode === 1 ? 0.6 : 1, target;
   if (VD.flight === 'jet') {
-    target = _co.set(0, 4.2 * close, -17 * close).applyQuaternion(S.q).add(S.pos);
-    _cl.set(0, 1.5, 9).applyQuaternion(S.q).add(S.pos);
+    var cs = (VD.camDist || 17) / 17;
+    target = _co.set(0, (VD.camH + 0.2) * close, -VD.camDist * close).applyQuaternion(S.q).add(S.pos);
+    _cl.set(0, 1.5 * cs, 9 * cs).applyQuaternion(S.q).add(S.pos);
     _cu.set(0, 1, 0).applyQuaternion(S.q).lerp(UPV, 0.45).normalize();
   } else if (VD.flight === 'heli') {
     var hcy = Math.cos(S.yaw), hsy = Math.sin(S.yaw), hb = 17 * close;
@@ -4176,7 +4667,11 @@ function flightCamera(dt, hs){
   var gy = heightAt(target.x, target.z) + 2;
   if (target.y < gy) target.y = gy;
   if (!flightCamInit) { camera.position.copy(target); flightCamInit = true; }
-  else camera.position.lerp(target, 1 - Math.exp(-(VD.flight === 'jet' ? 9 : 4) * dt));
+  else {
+    camera.position.x += S.pos.x - flightCamPrev.x; camera.position.y += S.pos.y - flightCamPrev.y; camera.position.z += S.pos.z - flightCamPrev.z;   // move with the plane so it never gets left behind at crazy speeds
+    camera.position.lerp(target, 1 - Math.exp(-(VD.flight === 'jet' ? 9 : 4) * dt));
+  }
+  flightCamPrev.copy(S.pos);
   camera.up.copy(_cu);
   camera.lookAt(_cl);
   camY = camera.position.y;
@@ -4425,6 +4920,10 @@ function exitHyper(){
   S.speed = S.horiz = S.hyperSpeed;          // you keep the hyperspace speed!
   takeoff();
   S.vy = 0; S.launchKind = null; S.launchDone = true;
+  if (VD.flight === 'jet') {                 // planes drop out flying level, well clear of the sand
+    S.grounded = false; S.flightT = 0; S.sink = 0; S.angV.set(0, 0, 0);
+    if (S.pos.y < hFull + VD.com + 40) S.pos.y = hFull + VD.com + 40;
+  }
   var fl = $('flash'); fl.className = 'hud blue'; void fl.offsetWidth; fl.className = 'hud blue show';
   toast('DROPPED OUT OF HYPERSPACE · ' + fmt(S.hyperSpeed * 3.6) + ' KM/H KEPT!', '#9fd8ff'); sfx('hyperExit');
 }
@@ -4784,6 +5283,10 @@ function frame(){
     if (tap('build') && !S.crashed) { placeBuildItem(); buildDirty = true; }
     if (tap('buildClear')) { clearBuild(); buildDirty = true; }
     if (tap('joinFriend')) joinFriend();
+    if (tap('exitVeh')) exitVehicle();
+    if (tap('missile')) fireMissile();
+    if (tap('horn')) honk();
+    if (tap('dragStrip')) dragToggle();
     if (RA && RA.phase === 'done') { RA.doneT += realDt; if (RA.doneT > 4) RA = null; }
     if (tap('overclock')) {
       S.overclock = !S.overclock; sfx(S.overclock ? 'overclock' : 'overclockOff');
@@ -4791,9 +5294,9 @@ function frame(){
       toast(S.overclock ? '⚡ OVERCLOCK ON · ' + ocWhat : 'OVERCLOCK OFF', S.overclock ? '#ff5a3c' : '#ffffff');
       if (S.overclock) { shakeT = Math.max(shakeT, 0.4); missionEvent('overclock', 1); }
     }
-    if (VD.admin && tap('thrust')) { if (hyper.phase === 0) startHyper(); else if (hyper.phase === 2) exitHyper(); }
+    if ((VD.admin || VD.hyper) && tap('thrust') && !S.glued) { if (hyper.phase === 0) startHyper(); else if (hyper.phase === 2) exitHyper(); }
     if (hyper.cool > 0) hyper.cool -= realDt;
-    if (hyper.phase === 1) { hyper.t += realDt; if (hyper.t >= 0.75) { if (VD.admin && !S.crashed) enterHyper(); else hyper.phase = 0; } }
+    if (hyper.phase === 1) { hyper.t += realDt; if (hyper.t >= 0.75) { if ((VD.admin || VD.hyper) && !S.crashed) enterHyper(); else hyper.phase = 0; } }
     else if (hyper.phase === 3) { hyper.t += realDt; if (hyper.t > 0.6) hyper.phase = 0; }
     var wasBoosting = S.boosting;
     S.boosting = !S.crashed && inp.boost && S.boost > 0;
@@ -4966,6 +5469,7 @@ function frame(){
   updateWildlife(dt);
   if (!paused) updateVariety(dt, hs);
   try { updateNet(realDt); } catch (e) { netError(e); }
+  if (!paused) { try { updatePlay(dt); } catch (e) { netError(e); } } else updateStripVisuals();
   updateClouds(realDt);
   if (windSand.visible) updateWindSand(realDt);
   if (!paused) updateTracks();
@@ -5008,11 +5512,12 @@ frame();
 </body>
 </html>`;
 
-// ---------- multiplayer server: ONE lobby (a Durable Object) that relays everyone's position ----------
-const MAX_PLAYERS = 40;
+// ---------- multiplayer server: ONE lobby (a Durable Object) that relays everyone's position and runs the drag races ----------
+const MAX_PLAYERS = 40, RACE_LOBBY_MS = 12000, RACE_MS = 60000, MAX_LANES = 8;
 function cleanName(n){ return String(n || '').replace(/[^\w \-.]/g, '').trim().slice(0, 16) || 'Rider'; }
+function num(v, lim){ v = +v; return isFinite(v) ? Math.max(-lim, Math.min(lim, v)) : 0; }
 export class Lobby {
-  constructor(ctx, env){ this.ctx = ctx; }
+  constructor(ctx, env){ this.ctx = ctx; this.race = null; this.records = null; }
   async fetch(request){
     if (request.headers.get('Upgrade') !== 'websocket') return new Response('Expected a WebSocket', { status: 426 });
     const pair = new WebSocketPair(), client = pair[0], server = pair[1];
@@ -5020,34 +5525,112 @@ export class Lobby {
     server.serializeAttachment({ id: crypto.randomUUID().slice(0, 8), name: '' });
     return new Response(null, { status: 101, webSocket: client });
   }
-  others(ws){ return this.ctx.getWebSockets().filter(w => { if (w === ws) return false; const a = w.deserializeAttachment() || {}; return a.name && !a.gone; }); }
+  all(){ return this.ctx.getWebSockets().filter(w => { const a = w.deserializeAttachment() || {}; return a.name && !a.gone; }); }
+  others(ws){ return this.all().filter(w => w !== ws); }
   broadcast(ws, msg){ for (const w of this.others(ws)) { try { w.send(msg); } catch (e) {} } }
+  broadcastAll(msg){ for (const w of this.all()) { try { w.send(msg); } catch (e) {} } }
+  async loadRecords(){
+    if (!this.records) { try { this.records = (await this.ctx.storage.get('dragRecords')) || []; } catch (e) { this.records = []; } }
+    return this.records;
+  }
+  raceInfo(now){
+    const r = this.race; if (!r) return null;
+    const until = r.phase === 'lobby' ? r.t0 : r.phase === 'lights' ? r.go : r.end;
+    return { phase: r.phase, in: Math.max(0, until - now), goIn: r.phase === 'lights' ? Math.max(0, r.go - now) : undefined,
+             players: [...r.players.values()].map(p => ({ id: p.id, name: p.name, lane: p.lane })) };
+  }
+  sendRace(now){ const info = this.raceInfo(now); if (info) this.broadcastAll(JSON.stringify(Object.assign({ t: 'race' }, info))); }
+  newLobby(now, entrants){
+    this.race = { phase: 'lobby', t0: now + RACE_LOBBY_MS, players: new Map(), next: new Map() };
+    for (const e of entrants) this.addRacer(e);
+  }
+  addRacer(e){
+    const r = this.race, used = new Set([...r.players.values()].map(p => p.lane));
+    const order = [3, 4, 2, 5, 1, 6, 0, 7], lane = order.find(l => !used.has(l));
+    if (lane === undefined) return false;
+    r.players.set(e.id, { id: e.id, name: e.name, veh: e.veh, lane, dist: null });
+    return true;
+  }
+  async raceTick(now){
+    const r = this.race; if (!r) return;
+    if (r.phase === 'lobby' && now >= r.t0) {
+      if (!r.players.size) { this.race = null; return; }
+      r.phase = 'lights'; r.go = now + 5000 + 500 + Math.random() * 2000; r.end = r.go + RACE_MS;
+      this.sendRace(now);
+    } else if (r.phase === 'lights' && now >= r.go) {
+      r.phase = 'racing';
+    } else if (r.phase === 'racing' && now >= r.end) {
+      const all = [...r.players.values()];
+      if (now < r.end + 5000 && all.some(p => p.dist === null)) return;   // give everyone a few seconds to report
+      r.phase = 'results';
+      const rows = all.map(p => ({ id: p.id, name: p.name, veh: p.veh, dist: p.dist || 0 })).sort((a, b) => b.dist - a.dist);
+      const recs = await this.loadRecords(), best = recs.length ? recs[0].dist : 0;
+      for (const row of rows) if (row.dist > 0) recs.push({ name: row.name, veh: row.veh, dist: row.dist, at: now });
+      recs.sort((a, b) => b.dist - a.dist); recs.length = Math.min(recs.length, 10);
+      try { await this.ctx.storage.put('dragRecords', recs); } catch (e) {}
+      this.broadcastAll(JSON.stringify({ t: 'raceResult', rows, records: recs, newRecord: rows.length > 0 && rows[0].dist > best }));
+      const next = [...r.next.values()];
+      this.race = null;
+      if (next.length) { this.newLobby(now, next); this.sendRace(now); }
+    }
+  }
   async webSocketMessage(ws, data){
     if (typeof data !== 'string' || data.length > 1500) return;
     let m; try { m = JSON.parse(data); } catch (e) { return; }
-    const me = ws.deserializeAttachment() || {};
+    const me = ws.deserializeAttachment() || {}, now = Date.now();
     if (m.t === 'hello') {
       const list = this.others(ws);
       if (!me.name && list.length >= MAX_PLAYERS) { ws.send(JSON.stringify({ t: 'full' })); ws.close(1013, 'full'); return; }
       const fresh = !me.name;
       me.name = cleanName(m.name); ws.serializeAttachment(me);
-      ws.send(JSON.stringify({ t: 'welcome', id: me.id, players: list.map(w => { const a = w.deserializeAttachment(); return { id: a.id, name: a.name }; }) }));
+      ws.send(JSON.stringify({ t: 'welcome', id: me.id, players: list.map(w => { const a = w.deserializeAttachment(); return { id: a.id, name: a.name }; }),
+                               records: await this.loadRecords(), race: this.raceInfo(now) }));
       this.broadcast(ws, JSON.stringify(fresh ? { t: 'join', id: me.id, name: me.name } : { t: 'name', id: me.id, name: me.name }));
     } else if (!me.name) {
       return;
+    } else if (m.t === 's' && Array.isArray(m.d) && m.d.length <= 16) {
+      const d = m.d.map(v => (typeof v === 'number' && isFinite(v)) ? v : 0);
+      this.broadcast(ws, JSON.stringify({ t: 's', id: me.id, n: me.name, d }));
     } else if (m.t === 'name') {
       me.name = cleanName(m.name); ws.serializeAttachment(me);
       this.broadcast(ws, JSON.stringify({ t: 'name', id: me.id, name: me.name }));
-    } else if (m.t === 's' && Array.isArray(m.d) && m.d.length <= 12) {
-      const d = m.d.map(v => (typeof v === 'number' && isFinite(v)) ? v : 0);
-      this.broadcast(ws, JSON.stringify({ t: 's', id: me.id, n: me.name, d }));
+    } else if (m.t === 'ev' && m.e && typeof m.e === 'object') {           // missiles, explosions, horn: shown to everyone
+      const e = { k: String(m.e.k || '').slice(0, 2) };
+      for (const f of ['x', 'y', 'z', 'vx', 'vy', 'vz']) if (m.e[f] !== undefined) e[f] = num(m.e[f], 1e9);
+      this.broadcast(ws, JSON.stringify({ t: 'ev', id: me.id, n: me.name, e }));
+    } else if (m.t === 'hit' && typeof m.to === 'string') {                 // a missile or ram hit one player
+      const target = this.others(ws).find(w => (w.deserializeAttachment() || {}).id === m.to);
+      if (target) try { target.send(JSON.stringify({ t: 'hit', from: me.id, n: me.name, k: m.k === 'ram' ? 'ram' : 'missile', vx: num(m.vx, 200), vy: num(m.vy, 200), vz: num(m.vz, 200) })); } catch (e) {}
+    } else if (m.t === 'dragJoin') {
+      const entrant = { id: me.id, name: me.name, veh: String(m.veh || 'bike').slice(0, 10) };
+      if (!this.race) this.newLobby(now, []);
+      const r = this.race;
+      if (r.players.has(me.id) || r.next.has(me.id)) { /* already in */ }
+      else if (r.phase === 'lobby' && this.addRacer(entrant)) { /* joined */ }
+      else { r.next.set(me.id, entrant); ws.send(JSON.stringify({ t: 'race', phase: 'wait', in: Math.max(0, (r.end || now + RACE_MS) - now) })); }
+      this.sendRace(now);
+    } else if (m.t === 'dragLeave') {
+      this.leaveRace(me.id, now);
+    } else if (m.t === 'dragResult' && this.race && this.race.players.has(me.id)) {
+      const p = this.race.players.get(me.id);
+      p.dist = Math.max(0, num(m.dist, 1e12)); if (m.veh) p.veh = String(m.veh).slice(0, 10);
+    }
+    await this.raceTick(now);
+  }
+  leaveRace(id, now){
+    const r = this.race; if (!r) return;
+    r.next.delete(id);
+    if (r.players.has(id) && (r.phase === 'lobby' || r.phase === 'lights')) {
+      r.players.delete(id);
+      if (!r.players.size) { this.race = null; this.broadcastAll(JSON.stringify({ t: 'race', phase: 'idle' })); return; }
+      this.sendRace(now);
     }
   }
   async webSocketClose(ws){ this.leave(ws); }
   async webSocketError(ws){ this.leave(ws); }
   leave(ws){
     const me = ws.deserializeAttachment() || {};
-    if (me.name && !me.gone) { me.gone = true; ws.serializeAttachment(me); this.broadcast(ws, JSON.stringify({ t: 'leave', id: me.id })); }
+    if (me.name && !me.gone) { me.gone = true; ws.serializeAttachment(me); this.leaveRace(me.id, Date.now()); this.broadcast(ws, JSON.stringify({ t: 'leave', id: me.id })); }
     try { ws.close(1000, 'bye'); } catch (e) {}
   }
 }
@@ -5058,7 +5641,8 @@ export default {
     if (url.pathname === '/ws') {
       if (!env || !env.LOBBY) return new Response('Multiplayer is not set up: add the LOBBY Durable Object binding (see wrangler.toml).', { status: 503 });
       if (request.headers.get('Upgrade') !== 'websocket') return new Response('Expected a WebSocket', { status: 426 });
-      return env.LOBBY.get(env.LOBBY.idFromName('main')).fetch(request);
+      // the lobby lives in Oceania ("oc"), close to the players, which keeps the lag down
+      return env.LOBBY.get(env.LOBBY.idFromName('main-oc'), { locationHint: 'oc' }).fetch(request);
     }
     return new Response(HTML, {
       headers: {
