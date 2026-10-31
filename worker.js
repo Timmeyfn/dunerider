@@ -236,6 +236,7 @@ table.pts td:last-child{text-align:right;color:#ffe14d;font-weight:700}
       <tr><td>Dust Devil 🌪️ (drive into a sand tornado) / Tornado Surf (aircraft)</td><td>4,000 / 2,500</td></tr>
       <tr><td>⚡ Random challenges (streak bonus, every 3rd = 🔥 FRENZY x2 for 20 s)</td><td>15,000–30,000</td></tr>
       <tr><td>Biomes: Red Canyon x1.25 · Black Sands x1.5 · Salt Flats = top-speed runs</td><td>x</td></tr>
+      <tr><td>🌠 Warp Interceptor: 100x the SR-71 · W 17 million km/h · F 60+ million · O x10 (~200 million km/h)</td><td>x2</td></tr>
       <tr><td>SR-71 Blackbird: hold W (lifts off by itself) · F afterburner · Shift hyperspace · O overclock x10 (2,000,000 km/h!)</td><td>x1.5</td></tr>
       <tr><td>🏁 Drag race (Y or the menu button): win / new all-time record · lights out = GO!</td><td>🏆</td></tr>
       <tr><td>Missile (M) blows up another player / smash into a slower player</td><td>5,000 / 3,000</td></tr>
@@ -729,20 +730,21 @@ scene.add(farGround);
 function rebuildTerrain(cx, cz){
   cx = Math.round(cx / CELL) * CELL; cz = Math.round(cz / CELL) * CELL;
   tCenter.x = cx; tCenter.z = cz;
-  var i, x, z, h;
+  var i, x, z, h, uo = { x: cx % 700, z: cz % 700 };
   for (i = 0; i < tPos.count; i++) {
     x = cx + baseXZ[i * 2]; z = cz + baseXZ[i * 2 + 1];
     h = baseHeight(x, z);                    // ramps & pyramids have their own meshes
-    tPos.setXYZ(i, x, h, z);
-    tUV.setXY(i, x / 7, z / 7);
+    tPos.setXYZ(i, baseXZ[i * 2], h, baseXZ[i * 2 + 1]);    // stored relative to the mesh centre so it stays sharp millions of km out
+    tUV.setXY(i, (uo.x + baseXZ[i * 2]) / 7, (uo.z + baseXZ[i * 2 + 1]) / 7);
   }
+  terrain.position.set(cx, 0, cz);
   tPos.needsUpdate = true; tUV.needsUpdate = true;
   tGeo.computeVertexNormals();
   tNor = tGeo.attributes.normal;
   for (i = 0; i < tPos.count; i++) {
     h = tPos.getY(i);
     var steep = Math.max(0, Math.min(1, (1 - tNor.getY(i)) * 3));
-    var x2 = tPos.getX(i), z2 = tPos.getZ(i);
+    var x2 = cx + baseXZ[i * 2], z2 = cz + baseXZ[i * 2 + 1];
     var patch = 0.04 * Math.sin(x2 * 0.021 + Math.sin(z2 * 0.017) * 2) + 0.03 * Math.sin(z2 * 0.033 - x2 * 0.011);
     sandColor(x2, z2, h, steep, patch, _sc);
     tColArr[i * 3] = _sc[0]; tColArr[i * 3 + 1] = _sc[1]; tColArr[i * 3 + 2] = _sc[2];
@@ -1890,6 +1892,45 @@ function buildDragster(){
   return V;
 }
 
+// ---- Warp Interceptor: a white needle-nosed starship with swept wings and glowing warp engines ----
+function buildWarp(){
+  var V = { model: new THREE.Group(), wheels: [], steer: [] }, m = V.model;
+  var white = std(0xeef2f6, 0.3, 0.5), dark = std(0x1c2230, 0.4, 0.6), trim = clearcoat(0x18c8ff, 0.4, 0.2);
+  var canopyM = new THREE.MeshPhysicalMaterial({ color: 0x66e0ff, metalness: 0.6, roughness: 0.05, transparent: true, opacity: 0.75, clearcoat: 1 });
+  var core = glow(0x7fe8ff, 2.4), hot = glow(0xffffff, 3);
+  side([[-8, 1.8], [-8, 2.6], [-2, 3.0], [6, 2.85], [11, 2.3], [15, 2.05], [11, 1.95], [-2, 1.7], [-8, 1.75]], 1.6, white, m, 0, 0.12);
+  side([[-7, 2.55], [-1, 2.95], [5, 2.95], [5, 2.8], [-1, 2.75]], 0.5, trim, m, 0, 0.04);
+  [-1, 1].forEach(function(s){
+    flatPart([[0.7, 4], [4.5, -2], [9.5, -6.5], [9.5, -7.6], [6, -7.0], [0.7, -6.0]], 0.18, white, m, 2.0, s < 0);    // swept wing
+    flatPart([[6, -5.6], [9.5, -6.6], [9.5, -7.6], [6, -7.0]], 0.2, trim, m, 2.01, s < 0);
+    rod(v(s * 2.6, 2.2, 1.5), v(s * 2.6, 2.2, -8.2), 0.95, dark, m, 20, 1.15);                             // warp engine pod
+    mesh(new THREE.TorusGeometry(1.15, 0.16, 10, 28), core, m, s * 2.6, 2.2, -8.25);
+    mesh(new THREE.CircleGeometry(0.95, 24), hot, m, s * 2.6, 2.2, -8.28, 0, Math.PI, 0);
+    mesh(new THREE.TorusGeometry(1.0, 0.1, 8, 24), core, m, s * 2.6, 2.2, 1.5);
+    box(0.06, 0.06, 4.2, core, m, s * 9.4, 2.12, -6.4);
+    var fin = grp(m, s * 2.6, 3.0, -5.5); fin.rotation.z = -s * 0.5;
+    side([[0, 0], [-2.0, 2.4], [-3.2, 2.4], [-2.6, 0]], 0.12, white, fin, 0, 0);
+  });
+  var canopy = mesh(new THREE.SphereGeometry(1, 24, 16), canopyM, m, 0, 3.0, 4.2); canopy.scale.set(0.6, 0.45, 2.0);
+  V.boostFlame = flame(m, 2.6, 2.2, -8.3, BLUE_FLAME, true, 2.6);
+  V.boostFlame2 = flame(m, -2.6, 2.2, -8.3, BLUE_FLAME, true, 2.6);
+  V.exhaust = [2.6, 2.2, -9.2];
+  V.gear = grp(m);
+  var rub = rubberMat(), strut = std(0xbfc4ca, 0.3, 0.9);
+  [[0, 7.5, 0.42], [2.6, -3.0, 0.5], [-2.6, -3.0, 0.5]].forEach(function(p){
+    rod(v(p[0], p[2], p[1]), v(p[0] * 0.8, 1.8, p[1]), 0.08, strut, V.gear, 8);
+    var wg = grp(V.gear, p[0], p[2], p[1]), sp = grp(wg);
+    mesh(new THREE.CylinderGeometry(p[2], p[2], 0.3, 18), rub, sp, 0, 0, 0, 0, 0, Math.PI / 2);
+    V.wheels.push({ g: sp, r: p[2] });
+  });
+  V.rider = makeRider({ suit: 0xf2f2f2, pants: 0x1c2230, accent: 0x18c8ff, helmet: 0xf2f2f2, lens: 0x18c8ff, number: '∞' });
+  V.rider.root.position.set(0, 2.45, 4.0); V.riderY = 2.45; V.rider.root.scale.setScalar(0.85);
+  m.add(V.rider.root);
+  V.paint = [white];
+  V.dust = [[0, 0, -2.0]];
+  return V;
+}
+
 // ---- Dune Buggy: tube-frame sand rail with big paddle tyres at the back ----
 function buildBuggy(){
   var V = { model: new THREE.Group(), wheels: [], steer: [] }, m = V.model;
@@ -2049,7 +2090,12 @@ VDEF.sr71 = { name: 'SR-71 Blackbird', icon: '🛩️', desc: 'Mach 300+ · Shif
   accel: 20, turn: 1, flip: 0, roll: 0, spin: 0, com: 2.0, lean: 0, pts: 1.5, style: false, jump: 0,
   camDist: 30, camH: 6, look: 2.5, width: 7, crashRest: 1.5, shadow: 34, blob: [16, 26], sound: 'jet', fpv: [0, 3.0, 7.6],
   pose: { torso: -0.3, sX: -1.1, sZ: 0.15, el: 0.4, hLX: -1.4, hLZ: 0.1, kL: 0.4, hRX: -1.4, hRZ: 0.1, kR: 0.4, lift: 0 } };
-var VEH_ORDER = ['bike', 'scooter', 'quad', 'buggy', 'car', 'monster', 'drag', 'jetpack', 'roadster', 'heli', 'jet', 'sr71', 'rocket', 'admin'];
+VDEF.warp = { name: 'Warp Interceptor', icon: '🌠', desc: '100x faster than the SR-71 · lightspeed-ish', build: buildWarp, flight: 'jet',
+  jt: 320000, jtIdle: 20, jtBoost: 480000, jtOc: 10, jDrag: 2.6e-9, groundThrust: 40,
+  accel: 20, turn: 1, flip: 0, roll: 0, spin: 0, com: 2.0, lean: 0, pts: 2, style: false, jump: 0,
+  camDist: 26, camH: 5.5, look: 2.5, width: 6, crashRest: 1.5, shadow: 30, blob: [14, 22], sound: 'jet', fpv: [0, 3.2, 5.2],
+  pose: { torso: -0.3, sX: -1.1, sZ: 0.15, el: 0.4, hLX: -1.4, hLZ: 0.1, kL: 0.4, hRX: -1.4, hRZ: 0.1, kR: 0.4, lift: 0 } };
+var VEH_ORDER = ['bike', 'scooter', 'quad', 'buggy', 'car', 'monster', 'drag', 'jetpack', 'roadster', 'heli', 'jet', 'sr71', 'warp', 'rocket', 'admin'];
 VEH_ORDER.forEach(function(key){
   var d = VDEF[key]; d.obj = d.build();
   d.obj.model.visible = false;
@@ -4204,7 +4250,12 @@ function updateRace(dt){
   }
 }
 
+var cacheTrimT = 0;
+function trimCaches(){
+  [oasisCache, rampCache, pyrCache, rockCache, lmCache].forEach(function(c){ if (c.size > 40000) c.clear(); });
+}
 function updatePlay(dt){
+  cacheTrimT -= dt; if (cacheTrimT <= 0) { cacheTrimT = 5; trimCaches(); }
   if (S.safeT > 0) S.safeT -= dt;
   if (hornCool > 0) hornCool -= dt;
   updateParked(dt);
@@ -4253,6 +4304,7 @@ var MISSIONS = [
   { id: 'speed20k', text: 'Reach 20,000 km/h', need: 1, ev: 'speed', min: 20000, xp: 500 },
   { id: 'blowup', text: 'Blow up or smash another player (M = missile)', need: 1, ev: 'blowup', xp: 300 },
   { id: 'dragwin', text: 'Win a drag race (Y = drag strip)', need: 1, ev: 'dragwin', xp: 500 },
+  { id: 'warp', text: 'Fly the Warp Interceptor at 100,000,000 km/h', need: 1, ev: 'speed', min: 100000000, xp: 800 },
   { id: 'sr71', text: 'Fly the SR-71 at 1,000,000 km/h', need: 1, ev: 'speed', min: 1000000, xp: 600 },
   { id: 'boosterland', text: 'Land the Moon Rocket on the pad (press Q in flight)', need: 1, ev: 'boosterland', xp: 600 },
   { id: 'bullseye', text: 'Land the rocket within 1.5 m of the pad centre', need: 1, ev: 'bullseye', xp: 800 },
@@ -5049,10 +5101,11 @@ function rebuildLowTerrain(cx, cz){
   cx = Math.round(cx / LC) * LC; cz = Math.round(cz / LC) * LC; lCenter.x = cx; lCenter.z = cz;
   for (var i = 0; i < lPos.count; i++) {
     var x = cx + lBase[i * 2], z = cz + lBase[i * 2 + 1], h = baseHeight(x, z);
-    lPos.setXYZ(i, x, h, z); lUV.setXY(i, x / 7, z / 7);
+    lPos.setXYZ(i, lBase[i * 2], h, lBase[i * 2 + 1]); lUV.setXY(i, ((cx % 700) + lBase[i * 2]) / 7, ((cz % 700) + lBase[i * 2 + 1]) / 7);
     sandColor(x, z, h, 0, 0, _sc);
     lCol[i * 3] = _sc[0]; lCol[i * 3 + 1] = _sc[1]; lCol[i * 3 + 2] = _sc[2];
   }
+  lowTerrain.position.set(cx, 0, cz);
   lPos.needsUpdate = true; lUV.needsUpdate = true; lGeo.attributes.color.needsUpdate = true;
   lGeo.computeVertexNormals();
 }
@@ -5333,7 +5386,7 @@ function frame(){
     if (RA && RA.phase === 'done') { RA.doneT += realDt; if (RA.doneT > 4) RA = null; }
     if (tap('overclock')) {
       S.overclock = !S.overclock; sfx(S.overclock ? 'overclock' : 'overclockOff');
-      var ocWhat = VD.flight === 'heli' ? 'rotor x6 · faster flips' : VD.key === 'sr71' ? 'engines x10 · hold on!' : VD.flight === 'jet' ? 'engines x6 · snappier' : VD.flight === 'rocket' ? 'engines x3' : VD.thrust ? 'motor & boost x10 · thrusters x3' : 'motor & boost x10';
+      var ocWhat = VD.flight === 'heli' ? 'rotor x6 · faster flips' : (VD.key === 'sr71' || VD.key === 'warp') ? 'engines x10 · hold on!' : VD.flight === 'jet' ? 'engines x6 · snappier' : VD.flight === 'rocket' ? 'engines x3' : VD.thrust ? 'motor & boost x10 · thrusters x3' : 'motor & boost x10';
       toast(S.overclock ? '⚡ OVERCLOCK ON · ' + ocWhat : 'OVERCLOCK OFF', S.overclock ? '#ff5a3c' : '#ffffff');
       if (S.overclock) { shakeT = Math.max(shakeT, 0.4); missionEvent('overclock', 1); }
     }
